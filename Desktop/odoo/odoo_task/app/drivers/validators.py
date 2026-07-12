@@ -2,6 +2,17 @@ from datetime import date
 
 from app.drivers.models import Driver
 
+from app.drivers.constants import (
+    DRIVER_STATUSES,
+    LICENSE_TYPES
+)
+
+def validate_driver_status(status):
+    return status in DRIVER_STATUSES
+
+
+def validate_license_type(license_type):
+    return license_type in LICENSE_TYPES
 
 VALID_DRIVER_STATUSES = [
     "AVAILABLE",

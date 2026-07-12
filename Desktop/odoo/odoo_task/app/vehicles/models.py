@@ -67,11 +67,20 @@ class Vehicle(db.Model):
         nullable=True
     )
 
+    # status = db.Column(
+    #     db.String(30),
+    #     nullable=False,
+    #     default="ACTIVE"
+    # )
+    from app.vehicles.constants import (
+    VEHICLE_STATUS_ACTIVE
+)
+
     status = db.Column(
-        db.String(30),
-        nullable=False,
-        default="ACTIVE"
-    )
+    db.String(30),
+    nullable=False,
+    default=VEHICLE_STATUS_ACTIVE
+)
 
     current_odometer = db.Column(
         db.Float,
