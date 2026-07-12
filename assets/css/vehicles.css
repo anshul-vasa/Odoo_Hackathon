@@ -1,0 +1,326 @@
+/* ===========================
+   Vehicle Registry
+=========================== */
+
+.page-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+}
+
+.page-header h1{
+    font-size:30px;
+    font-weight:700;
+    color:#fff;
+}
+
+#addBtn{
+    background:linear-gradient(45deg,#f59e0b,#d97706);
+    color:#fff;
+    border:none;
+    padding:12px 22px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:600;
+    transition:.3s;
+}
+
+#addBtn:hover{
+    transform:translateY(-2px);
+    box-shadow:0 8px 18px rgba(245,158,11,.35);
+}
+
+/* Toolbar */
+
+.toolbar{
+    display:flex;
+    gap:15px;
+    margin-bottom:25px;
+    flex-wrap:wrap;
+}
+
+.toolbar input,
+.toolbar select{
+    background:#1f2937;
+    color:#fff;
+    border:1px solid #374151;
+    border-radius:10px;
+    padding:12px 15px;
+    outline:none;
+    min-width:220px;
+}
+
+.toolbar input{
+    flex:1;
+}
+
+/* Form */
+
+.form-box{
+    display:none;
+    background:#1b2433;
+    border:1px solid #2c394d;
+    border-radius:15px;
+    padding:25px;
+    margin-bottom:30px;
+    box-shadow:0 10px 25px rgba(0,0,0,.25);
+}
+
+.form-box h2{
+    margin-bottom:20px;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:18px;
+}
+
+.grid input,
+.grid select{
+
+    width:100%;
+    padding:13px 15px;
+    background:#111827;
+    color:#fff;
+    border:1px solid #374151;
+    border-radius:10px;
+    outline:none;
+}
+
+.grid input:focus,
+.grid select:focus{
+
+    border-color:#f59e0b;
+
+}
+
+/* Buttons */
+
+.buttons{
+    margin-top:25px;
+    display:flex;
+    gap:12px;
+}
+
+.buttons button{
+
+    border:none;
+    padding:12px 25px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:600;
+    transition:.3s;
+}
+
+#saveVehicle{
+
+    background:#22c55e;
+    color:white;
+
+}
+
+#cancel{
+
+    background:#ef4444;
+    color:white;
+
+}
+
+.buttons button:hover{
+
+    opacity:.9;
+    transform:translateY(-2px);
+
+}
+
+/* Table */
+
+.table-box{
+
+    background:#1b2433;
+    border-radius:15px;
+    overflow:hidden;
+    box-shadow:0 10px 25px rgba(0,0,0,.25);
+
+}
+
+table{
+
+    width:100%;
+    border-collapse:collapse;
+
+}
+
+thead{
+
+    background:#111827;
+
+}
+
+thead th{
+
+    padding:16px;
+    text-align:left;
+    color:#e5e7eb;
+    font-size:14px;
+
+}
+
+tbody td{
+
+    padding:15px;
+    border-top:1px solid #2c394d;
+    color:#d1d5db;
+
+}
+
+tbody tr{
+
+    transition:.3s;
+
+}
+
+tbody tr:hover{
+
+    background:#202b3c;
+
+}
+
+/* Status */
+
+.status{
+
+    padding:6px 12px;
+    border-radius:20px;
+    color:white;
+    font-size:12px;
+    font-weight:600;
+
+}
+
+.available{
+
+    background:#22c55e;
+
+}
+
+.trip{
+
+    background:#3b82f6;
+
+}
+
+.shop{
+
+    background:#f59e0b;
+
+}
+
+.retired{
+
+    background:#ef4444;
+
+}
+
+/* Action Buttons */
+
+.edit-btn{
+
+    background:#3b82f6;
+    color:white;
+    border:none;
+    padding:8px 14px;
+    border-radius:8px;
+    cursor:pointer;
+    margin-right:8px;
+    transition:.3s;
+
+}
+
+.delete-btn{
+
+    background:#ef4444;
+    color:white;
+    border:none;
+    padding:8px 14px;
+    border-radius:8px;
+    cursor:pointer;
+    transition:.3s;
+
+}
+
+.edit-btn:hover,
+.delete-btn:hover{
+
+    transform:scale(1.05);
+
+}
+
+/* Empty State */
+
+.empty{
+
+    text-align:center;
+    padding:35px;
+    color:#9ca3af;
+    font-size:16px;
+
+}
+
+/* Responsive */
+
+@media(max-width:992px){
+
+.grid{
+
+grid-template-columns:1fr;
+
+}
+
+.toolbar{
+
+flex-direction:column;
+
+}
+
+.toolbar input,
+.toolbar select{
+
+width:100%;
+
+}
+
+table{
+
+display:block;
+overflow-x:auto;
+
+}
+
+}
+
+@media(max-width:600px){
+
+.page-header{
+
+flex-direction:column;
+align-items:flex-start;
+gap:15px;
+
+}
+
+.buttons{
+
+flex-direction:column;
+
+}
+
+.buttons button{
+
+width:100%;
+
+}
+
+}

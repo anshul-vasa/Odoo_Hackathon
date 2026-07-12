@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TransitOps Login</title>
+
+    <link rel="stylesheet" href="assets/css/login.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Left Panel -->
+
+    <div class="left">
+
+        <div class="logo">
+            🚛
+        </div>
+
+        <h1>TransitOps</h1>
+
+        <p class="subtitle">
+            Smart Transport Operations Platform
+        </p>
+
+        <div class="roles">
+
+            <h3>One login, four roles:</h3>
+
+            <ul>
+                <li>Fleet Manager</li>
+                <li>Dispatcher</li>
+                <li>Safety Officer</li>
+                <li>Financial Analyst</li>
+            </ul>
+
+        </div>
+
+        <div class="footer">
+            TRANSITOPS © 2026 • RBAC ENABLED
+        </div>
+
+    </div>
+
+    <!-- Right Panel -->
+
+    <div class="right">
+
+        <div class="login-box">
+
+            <h2>Sign in to your account</h2>
+
+            <p>Enter your credentials to continue.</p>
+
+            <form id="loginForm">
+
+                <label>Email</label>
+
+                <input
+                        type="email"
+                        id="email"
+                        placeholder="Enter Email"
+                        required>
+
+                <label>Password</label>
+
+                <input
+                        type="password"
+                        id="password"
+                        placeholder="Enter Password"
+                        required>
+
+                <label>Select Role</label>
+
+                <select id="role">
+
+                    <option>Fleet Manager</option>
+
+                    <option>Dispatcher</option>
+
+                    <option>Safety Officer</option>
+
+                    <option>Financial Analyst</option>
+
+                </select>
+
+                <div class="options">
+
+                    <label>
+
+                        <input type="checkbox">
+
+                        Remember Me
+
+                    </label>
+
+                    <a href="#">Forgot Password?</a>
+
+                </div>
+
+                <button type="submit">
+                    Sign In
+                </button>
+
+            </form>
+
+            <div id="error"></div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="assets/js/auth.js"></script>
+
+</body>
+</html>

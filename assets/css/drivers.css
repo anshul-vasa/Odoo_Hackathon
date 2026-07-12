@@ -1,0 +1,471 @@
+/* ==========================================
+   DRIVER MANAGEMENT
+========================================== */
+
+.page-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+}
+
+.page-header h1{
+    font-size:34px;
+    font-weight:700;
+    color:#fff;
+}
+
+#addBtn{
+    background:linear-gradient(135deg,#f59e0b,#d97706);
+    color:#fff;
+    border:none;
+    padding:13px 25px;
+    border-radius:12px;
+    font-size:16px;
+    font-weight:600;
+    cursor:pointer;
+    transition:.3s;
+    box-shadow:0 10px 25px rgba(245,158,11,.25);
+}
+
+#addBtn:hover{
+    transform:translateY(-3px);
+    box-shadow:0 15px 30px rgba(245,158,11,.45);
+}
+
+/* Toolbar */
+
+.toolbar{
+    display:flex;
+    gap:20px;
+    margin-bottom:30px;
+    flex-wrap:wrap;
+}
+
+.toolbar input,
+.toolbar select{
+
+    flex:1;
+    min-width:250px;
+
+    padding:14px 16px;
+
+    background:#111827;
+
+    border:1px solid #374151;
+
+    color:white;
+
+    border-radius:12px;
+
+    outline:none;
+
+    transition:.3s;
+
+}
+
+.toolbar input:focus,
+.toolbar select:focus{
+
+    border-color:#f59e0b;
+
+    box-shadow:0 0 0 4px rgba(245,158,11,.12);
+
+}
+
+/* Form */
+
+.form-box{
+
+    display:none;
+
+    background:#1b2433;
+
+    border:1px solid #2f3d53;
+
+    border-radius:16px;
+
+    padding:30px;
+
+    margin-bottom:35px;
+
+    box-shadow:0 15px 35px rgba(0,0,0,.25);
+
+}
+
+.form-box h2{
+
+    margin-bottom:25px;
+
+    font-size:28px;
+
+}
+
+.grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:20px;
+
+}
+
+.grid input,
+.grid select{
+
+    width:100%;
+
+    padding:15px;
+
+    background:#111827;
+
+    border:1px solid #374151;
+
+    color:white;
+
+    border-radius:12px;
+
+    outline:none;
+
+    transition:.3s;
+
+}
+
+.grid input:focus,
+.grid select:focus{
+
+    border-color:#3b82f6;
+
+}
+
+/* Buttons */
+
+.buttons{
+
+    display:flex;
+
+    gap:15px;
+
+    margin-top:30px;
+
+}
+
+#saveDriver{
+
+    background:#22c55e;
+
+    color:white;
+
+    border:none;
+
+    padding:14px 28px;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    font-size:15px;
+
+    font-weight:600;
+
+    transition:.3s;
+
+}
+
+#saveDriver:hover{
+
+    background:#16a34a;
+
+}
+
+#cancel{
+
+    background:#ef4444;
+
+    color:white;
+
+    border:none;
+
+    padding:14px 28px;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    font-size:15px;
+
+    font-weight:600;
+
+}
+
+#cancel:hover{
+
+    background:#dc2626;
+
+}
+
+/* Table */
+
+.table-box{
+
+    background:#1b2433;
+
+    border-radius:16px;
+
+    overflow:hidden;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.2);
+
+}
+
+table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+}
+
+thead{
+
+    background:#111827;
+
+}
+
+thead th{
+
+    color:white;
+
+    padding:18px;
+
+    text-align:left;
+
+    font-size:14px;
+
+}
+
+tbody td{
+
+    padding:18px;
+
+    border-top:1px solid #2b3648;
+
+    color:#d1d5db;
+
+}
+
+tbody tr{
+
+    transition:.3s;
+
+}
+
+tbody tr:hover{
+
+    background:#243044;
+
+}
+
+/* Safety Score */
+
+.score{
+
+    font-weight:700;
+
+}
+
+.score.high{
+
+    color:#22c55e;
+
+}
+
+.score.medium{
+
+    color:#f59e0b;
+
+}
+
+.score.low{
+
+    color:#ef4444;
+
+}
+
+/* Status */
+
+.status{
+
+    display:inline-block;
+
+    padding:7px 14px;
+
+    border-radius:30px;
+
+    color:white;
+
+    font-size:12px;
+
+    font-weight:600;
+
+}
+
+.available{
+
+    background:#22c55e;
+
+}
+
+.trip{
+
+    background:#3b82f6;
+
+}
+
+.off{
+
+    background:#6b7280;
+
+}
+
+.suspended{
+
+    background:#ef4444;
+
+}
+
+/* Action Buttons */
+
+.edit-btn{
+
+    background:#3b82f6;
+
+    color:white;
+
+    border:none;
+
+    padding:8px 14px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+    margin-right:8px;
+
+    transition:.3s;
+
+}
+
+.delete-btn{
+
+    background:#ef4444;
+
+    color:white;
+
+    border:none;
+
+    padding:8px 14px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+.edit-btn:hover{
+
+    transform:scale(1.05);
+
+    background:#2563eb;
+
+}
+
+.delete-btn:hover{
+
+    transform:scale(1.05);
+
+    background:#dc2626;
+
+}
+
+/* Empty State */
+
+.empty{
+
+    text-align:center;
+
+    padding:35px;
+
+    color:#94a3b8;
+
+    font-size:16px;
+
+}
+
+/* Responsive */
+
+@media(max-width:992px){
+
+.grid{
+
+grid-template-columns:1fr;
+
+}
+
+.toolbar{
+
+flex-direction:column;
+
+}
+
+.toolbar input,
+.toolbar select{
+
+width:100%;
+
+}
+
+table{
+
+display:block;
+
+overflow-x:auto;
+
+}
+
+}
+
+@media(max-width:600px){
+
+.page-header{
+
+flex-direction:column;
+
+align-items:flex-start;
+
+gap:15px;
+
+}
+
+.buttons{
+
+flex-direction:column;
+
+}
+
+.buttons button{
+
+width:100%;
+
+}
+
+.form-box{
+
+padding:20px;
+
+}
+
+}

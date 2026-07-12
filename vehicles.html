@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Vehicle Registry</title>
+
+<link rel="stylesheet" href="assets/css/dashboard.css">
+<link rel="stylesheet" href="assets/css/vehicles.css">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- Sidebar -->
+
+<aside class="sidebar">
+
+        <h2 class="logo">TransitOps</h2>
+
+        <ul>
+            <li onclick="location.href='dashboard.html'">Dashboard</li>
+            <li onclick="location.href='vehicles.html'">Fleet</li>
+            <li onclick="location.href='drivers.html'">Drivers</li>
+            <li onclick="location.href='trips.html'">Trips</li>
+            <li onclick="location.href='maintenance.html'">Maintenance</li>
+            <li onclick="location.href='fuel.html'">Fuel & Expenses</li>
+            <li onclick="location.href='reports.html'">Reports</li>
+        </ul>
+
+    </aside>
+
+<!-- Main -->
+
+<main class="main">
+
+<div class="page-header">
+
+<h1>Vehicle Registry</h1>
+
+<button id="addBtn">
++ Add Vehicle
+</button>
+
+</div>
+
+<!-- Search -->
+
+<div class="toolbar">
+
+<input
+type="text"
+id="search"
+placeholder="Search Vehicle...">
+
+<select id="typeFilter">
+
+<option value="">Vehicle Type</option>
+
+<option>Truck</option>
+
+<option>Van</option>
+
+<option>Mini Truck</option>
+
+<option>Pickup</option>
+
+</select>
+
+<select id="statusFilter">
+
+<option value="">Status</option>
+
+<option>Available</option>
+
+<option>On Trip</option>
+
+<option>In Shop</option>
+
+<option>Retired</option>
+
+</select>
+
+</div>
+
+<!-- Add Vehicle -->
+
+<div class="form-box" id="vehicleForm">
+
+<h2>Add Vehicle</h2>
+
+<div class="grid">
+
+<input
+type="text"
+id="regNo"
+placeholder="Registration Number">
+
+<input
+type="text"
+id="model"
+placeholder="Vehicle Name / Model">
+
+<select id="type">
+
+<option>Truck</option>
+
+<option>Van</option>
+
+<option>Mini Truck</option>
+
+<option>Pickup</option>
+
+</select>
+
+<input
+type="number"
+id="capacity"
+placeholder="Maximum Load Capacity (KG)">
+
+<input
+type="number"
+id="odometer"
+placeholder="Current Odometer">
+
+<input
+type="number"
+id="cost"
+placeholder="Acquisition Cost">
+
+<select id="status">
+
+<option>Available</option>
+
+<option>On Trip</option>
+
+<option>In Shop</option>
+
+<option>Retired</option>
+
+</select>
+
+</div>
+
+<div class="buttons">
+
+<button id="saveVehicle">
+Save Vehicle
+</button>
+
+<button id="cancel">
+Cancel
+</button>
+
+</div>
+
+</div>
+
+<!-- Vehicle Table -->
+
+<div class="table-box">
+
+<table id="vehicleTable">
+
+<thead>
+
+<tr>
+
+<th>Reg No</th>
+
+<th>Model</th>
+
+<th>Type</th>
+
+<th>Capacity</th>
+
+<th>Odometer</th>
+
+<th>Cost</th>
+
+<th>Status</th>
+
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+<!-- Dynamic -->
+
+</tbody>
+
+</table>
+
+</div>
+
+</main>
+
+</div>
+
+<script src="assets/js/vehicles.js"></script>
+
+</body>
+</html>
