@@ -1,0 +1,279 @@
+/* ==========================================
+   MAINTENANCE PAGE
+========================================== */
+
+.page-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+}
+
+.page-header h1{
+    font-size:32px;
+    color:#fff;
+    font-weight:700;
+}
+
+#addBtn{
+    background:linear-gradient(135deg,#f59e0b,#d97706);
+    color:#fff;
+    border:none;
+    padding:13px 25px;
+    border-radius:12px;
+    cursor:pointer;
+    font-size:15px;
+    font-weight:600;
+    transition:.3s;
+    box-shadow:0 10px 25px rgba(245,158,11,.3);
+}
+
+#addBtn:hover{
+    transform:translateY(-3px);
+}
+
+/* Toolbar */
+
+.toolbar{
+    display:flex;
+    gap:20px;
+    flex-wrap:wrap;
+    margin-bottom:25px;
+}
+
+.toolbar input,
+.toolbar select{
+    flex:1;
+    min-width:250px;
+    padding:14px;
+    border-radius:10px;
+    border:1px solid #374151;
+    background:#111827;
+    color:#fff;
+    outline:none;
+}
+
+.toolbar input:focus,
+.toolbar select:focus{
+    border-color:#3b82f6;
+}
+
+/* Form */
+
+.form-box{
+    display:none;
+    background:#1b2433;
+    border-radius:16px;
+    padding:30px;
+    margin-bottom:30px;
+    box-shadow:0 15px 35px rgba(0,0,0,.25);
+}
+
+.form-box h2{
+    margin-bottom:25px;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:20px;
+}
+
+.grid input,
+.grid select,
+.grid textarea{
+    width:100%;
+    padding:14px;
+    background:#111827;
+    color:#fff;
+    border:1px solid #374151;
+    border-radius:10px;
+    outline:none;
+    transition:.3s;
+}
+
+.grid textarea{
+    resize:none;
+    height:100px;
+    grid-column:span 2;
+}
+
+.grid input:focus,
+.grid select:focus,
+.grid textarea:focus{
+    border-color:#3b82f6;
+}
+
+/* Buttons */
+
+.buttons{
+    margin-top:25px;
+    display:flex;
+    gap:15px;
+}
+
+#saveMaintenance{
+    background:#22c55e;
+    color:white;
+    border:none;
+    padding:13px 25px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:600;
+}
+
+#cancel{
+    background:#ef4444;
+    color:white;
+    border:none;
+    padding:13px 25px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:600;
+}
+
+#saveMaintenance:hover{
+    background:#16a34a;
+}
+
+#cancel:hover{
+    background:#dc2626;
+}
+
+/* Table */
+
+.table-box{
+    background:#1b2433;
+    border-radius:15px;
+    overflow:hidden;
+    box-shadow:0 10px 30px rgba(0,0,0,.25);
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+thead{
+    background:#111827;
+}
+
+thead th{
+    padding:16px;
+    text-align:left;
+    color:#fff;
+}
+
+tbody td{
+    padding:16px;
+    border-top:1px solid #2b3648;
+    color:#d1d5db;
+}
+
+tbody tr:hover{
+    background:#243044;
+}
+
+/* Status */
+
+.badge{
+    display:inline-block;
+    padding:6px 14px;
+    border-radius:30px;
+    color:#fff;
+    font-size:12px;
+    font-weight:600;
+}
+
+.pending{
+    background:#f59e0b;
+}
+
+.progress{
+    background:#3b82f6;
+}
+
+.completed{
+    background:#22c55e;
+}
+
+/* Buttons */
+
+.edit-btn,
+.complete-btn,
+.delete-btn{
+    border:none;
+    padding:8px 12px;
+    border-radius:8px;
+    color:white;
+    cursor:pointer;
+    margin-right:5px;
+    transition:.3s;
+}
+
+.edit-btn{
+    background:#3b82f6;
+}
+
+.complete-btn{
+    background:#22c55e;
+}
+
+.delete-btn{
+    background:#ef4444;
+}
+
+.edit-btn:hover,
+.complete-btn:hover,
+.delete-btn:hover{
+    transform:scale(1.05);
+}
+
+/* Empty */
+
+.empty{
+    text-align:center;
+    padding:35px;
+    color:#94a3b8;
+}
+
+/* Responsive */
+
+@media(max-width:992px){
+
+.grid{
+grid-template-columns:1fr;
+}
+
+.grid textarea{
+grid-column:span 1;
+}
+
+.toolbar{
+flex-direction:column;
+}
+
+table{
+display:block;
+overflow-x:auto;
+}
+
+}
+
+@media(max-width:600px){
+
+.page-header{
+flex-direction:column;
+align-items:flex-start;
+gap:15px;
+}
+
+.buttons{
+flex-direction:column;
+}
+
+.buttons button{
+width:100%;
+}
+
+}

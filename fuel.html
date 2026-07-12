@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Fuel & Expenses</title>
+
+<link rel="stylesheet" href="assets/css/dashboard.css">
+<link rel="stylesheet" href="assets/css/fuel.css">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- Sidebar -->
+
+<aside class="sidebar">
+
+<h2 class="logo">🚚 TransitOps</h2>
+
+<ul>
+
+<li onclick="location.href='dashboard.html'">Dashboard</li>
+
+<li onclick="location.href='vehicles.html'">Fleet</li>
+
+<li onclick="location.href='drivers.html'">Drivers</li>
+
+<li onclick="location.href='trips.html'">Trips</li>
+
+<li onclick="location.href='maintenance.html'">Maintenance</li>
+
+<li class="active">Fuel & Expenses</li>
+
+<li onclick="location.href='reports.html'">Reports</li>
+
+</ul>
+
+</aside>
+
+<main class="main">
+
+<div class="page-header">
+
+<h1>Fuel & Expense Management</h1>
+
+<button id="addBtn">
++ Add Expense
+</button>
+
+</div>
+
+<div class="toolbar">
+
+<input
+type="text"
+id="search"
+placeholder="Search Vehicle">
+
+</div>
+
+<div class="form-box" id="fuelForm">
+
+<h2>Add Fuel / Expense</h2>
+
+<div class="grid">
+
+<select id="vehicle">
+
+<option>Select Vehicle</option>
+
+</select>
+
+<input
+type="date"
+id="date">
+
+<input
+type="number"
+id="fuelLiter"
+placeholder="Fuel (Liters)">
+
+<input
+type="number"
+id="fuelCost"
+placeholder="Fuel Cost">
+
+<input
+type="number"
+id="toll"
+placeholder="Toll Charges">
+
+<input
+type="number"
+id="other"
+placeholder="Other Expenses">
+
+</div>
+
+<div class="buttons">
+
+<button id="saveExpense">
+
+Save
+
+</button>
+
+<button id="cancel">
+
+Cancel
+
+</button>
+
+</div>
+
+</div>
+
+<div class="table-box">
+
+<table id="expenseTable">
+
+<thead>
+
+<tr>
+
+<th>Vehicle</th>
+
+<th>Date</th>
+
+<th>Fuel</th>
+
+<th>Fuel Cost</th>
+
+<th>Toll</th>
+
+<th>Other</th>
+
+<th>Total</th>
+
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+</tbody>
+
+</table>
+
+</div>
+
+</main>
+
+</div>
+
+<script src="assets/js/fuel.js"></script>
+
+</body>
+
+</html>

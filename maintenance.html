@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Vehicle Registry</title>
+<title>Maintenance | TransitOps</title>
 
 <link rel="stylesheet" href="assets/css/dashboard.css">
-<link rel="stylesheet" href="assets/css/vehicles.css">
+<link rel="stylesheet" href="assets/css/maintenance.css">
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
@@ -28,13 +29,13 @@
 
 <li onclick="location.href='dashboard.html'">Dashboard</li>
 
-<li class="active">Fleet</li>
+<li onclick="location.href='vehicles.html'">Fleet</li>
 
 <li onclick="location.href='drivers.html'">Drivers</li>
 
 <li onclick="location.href='trips.html'">Trips</li>
 
-<li onclick="location.href='maintenance.html'">Maintenance</li>
+<li class="active">Maintenance</li>
 
 <li onclick="location.href='fuel.html'">Fuel & Expenses</li>
 
@@ -50,10 +51,10 @@
 
 <div class="page-header">
 
-<h1>Vehicle Registry</h1>
+<h1>Vehicle Maintenance</h1>
 
 <button id="addBtn">
-+ Add Vehicle
++ New Service
 </button>
 
 </div>
@@ -67,128 +68,115 @@ type="text"
 id="search"
 placeholder="Search Vehicle...">
 
-<select id="typeFilter">
-
-<option value="">Vehicle Type</option>
-
-<option>Truck</option>
-
-<option>Van</option>
-
-<option>Mini Truck</option>
-
-<option>Pickup</option>
-
-</select>
-
 <select id="statusFilter">
 
-<option value="">Status</option>
+<option value="">All Status</option>
 
-<option>Available</option>
+<option>Pending</option>
 
-<option>On Trip</option>
+<option>In Progress</option>
 
-<option>In Shop</option>
-
-<option>Retired</option>
+<option>Completed</option>
 
 </select>
 
 </div>
 
-<!-- Add Vehicle -->
+<!-- Form -->
 
-<div class="form-box" id="vehicleForm">
+<div class="form-box" id="maintenanceForm">
 
-<h2>Add Vehicle</h2>
+<h2>Maintenance Details</h2>
 
 <div class="grid">
 
-<input
-type="text"
-id="regNo"
-placeholder="Registration Number">
+<select id="vehicle">
 
-<input
-type="text"
-id="model"
-placeholder="Vehicle Name / Model">
+<option>Select Vehicle</option>
 
-<select id="type">
+</select>
 
-<option>Truck</option>
+<select id="serviceType">
 
-<option>Van</option>
+<option>Oil Change</option>
 
-<option>Mini Truck</option>
+<option>Engine Service</option>
 
-<option>Pickup</option>
+<option>Brake Service</option>
+
+<option>Tyre Replacement</option>
+
+<option>Battery</option>
+
+<option>General Service</option>
 
 </select>
 
 <input
-type="number"
-id="capacity"
-placeholder="Maximum Load Capacity (KG)">
-
-<input
-type="number"
-id="odometer"
-placeholder="Current Odometer">
+type="date"
+id="serviceDate">
 
 <input
 type="number"
 id="cost"
-placeholder="Acquisition Cost">
+placeholder="Service Cost">
+
+<input
+type="text"
+id="mechanic"
+placeholder="Mechanic Name">
 
 <select id="status">
 
-<option>Available</option>
+<option>Pending</option>
 
-<option>On Trip</option>
+<option>In Progress</option>
 
-<option>In Shop</option>
-
-<option>Retired</option>
+<option>Completed</option>
 
 </select>
+
+<textarea
+id="remarks"
+placeholder="Remarks"></textarea>
 
 </div>
 
 <div class="buttons">
 
-<button id="saveVehicle">
-Save Vehicle
+<button id="saveMaintenance">
+
+Save
+
 </button>
 
 <button id="cancel">
+
 Cancel
+
 </button>
 
 </div>
 
 </div>
 
-<!-- Vehicle Table -->
+<!-- Table -->
 
 <div class="table-box">
 
-<table id="vehicleTable">
+<table id="maintenanceTable">
 
 <thead>
 
 <tr>
 
-<th>Reg No</th>
+<th>Vehicle</th>
 
-<th>Model</th>
+<th>Service</th>
 
-<th>Type</th>
+<th>Date</th>
 
-<th>Capacity</th>
-
-<th>Odometer</th>
+<th>Mechanic</th>
 
 <th>Cost</th>
 
@@ -202,8 +190,6 @@ Cancel
 
 <tbody>
 
-<!-- Dynamic -->
-
 </tbody>
 
 </table>
@@ -214,7 +200,8 @@ Cancel
 
 </div>
 
-<script src="assets/js/vehicles.js"></script>
+<script src="assets/js/maintenance.js"></script>
 
 </body>
+
 </html>
