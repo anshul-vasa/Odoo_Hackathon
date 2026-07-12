@@ -2,24 +2,26 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Driver Management | TransitOps</title>
 
-    <link rel="stylesheet" href="assets/css/dashboard.css">
-    <link rel="stylesheet" href="assets/css/drivers.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
+<title>Driver Management | TransitOps</title>
+
+<link rel="stylesheet" href="assets/css/dashboard.css">
+<link rel="stylesheet" href="assets/css/drivers.css">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
 </head>
 
 <body>
 
 <div class="container">
 
-    <!-- Sidebar -->
+<!-- Sidebar -->
 
-   <aside class="sidebar">
+<aside class="sidebar">
 
 <h2 class="logo">🚚 TransitOps</h2>
 
@@ -45,153 +47,164 @@
 
 </aside>
 
-    <!-- Main -->
+<!-- Main -->
 
-    <main class="main">
+<main class="main">
 
-        <div class="page-header">
+<div class="page-header">
 
-            <h1>Driver Management</h1>
+<h1>Driver Management</h1>
 
-            <button id="addBtn">
-                + Add Driver
-            </button>
+<button type="button" id="addDriver">
 
-        </div>
++ Add Driver
 
-        <!-- Toolbar -->
+</button>
 
-        <div class="toolbar">
+</div>
 
-            <input
-                type="text"
-                id="search"
-                placeholder="Search Driver...">
+<!-- Search -->
 
-            <select id="statusFilter">
+<div class="toolbar">
 
-                <option value="">All Status</option>
+<input
+type="text"
+id="searchDriver"
+placeholder="Search Driver...">
 
-                <option>Available</option>
+<select id="filterStatus">
 
-                <option>On Trip</option>
+<option value="">All Status</option>
 
-                <option>Off Duty</option>
+<option value="Available">Available</option>
 
-                <option>Suspended</option>
+<option value="On Trip">On Trip</option>
 
-            </select>
+<option value="Off Duty">Off Duty</option>
 
-        </div>
+<option value="Suspended">Suspended</option>
 
-        <!-- Form -->
+</select>
 
-        <div class="form-box" id="driverForm">
+</div>
 
-            <h2>Add Driver</h2>
+<!-- Form -->
 
-            <div class="grid">
+<div class="form-box" id="driverBox">
 
-                <input
-                    type="text"
-                    id="driverName"
-                    placeholder="Driver Name">
+<h2 id="formTitle">
 
-                <input
-                    type="text"
-                    id="licenseNumber"
-                    placeholder="License Number">
+Add Driver
 
-                <input
-                    type="text"
-                    id="licenseCategory"
-                    placeholder="License Category">
+</h2>
 
-                <input
-                    type="date"
-                    id="licenseExpiry">
+<div class="grid">
 
-                <input
-                    type="tel"
-                    id="contactNumber"
-                    placeholder="Contact Number">
+<input
+type="text"
+id="driverName"
+placeholder="Driver Name">
 
-                <input
-                    type="number"
-                    id="safetyScore"
-                    placeholder="Safety Score">
+<input
+type="text"
+id="licenseNo"
+placeholder="License Number">
 
-                <select id="status">
+<input
+type="text"
+id="licenseCategory"
+placeholder="License Category">
 
-                    <option>Available</option>
+<input
+type="date"
+id="expiryDate">
 
-                    <option>On Trip</option>
+<input
+type="tel"
+id="mobile"
+placeholder="Mobile Number">
 
-                    <option>Off Duty</option>
+<input
+type="number"
+id="safetyScore"
+placeholder="Safety Score (0-100)">
 
-                    <option>Suspended</option>
+<select id="driverStatus">
 
-                </select>
+<option>Available</option>
 
-            </div>
+<option>On Trip</option>
 
-            <div class="buttons">
+<option>Off Duty</option>
 
-                <button id="saveDriver">
-                    Save Driver
-                </button>
+<option>Suspended</option>
 
-                <button id="cancel">
-                    Cancel
-                </button>
+</select>
 
-            </div>
+</div>
 
-        </div>
+<div class="buttons">
 
-        <!-- Table -->
+<button type="button" id="saveDriver">
 
-        <div class="table-box">
+Save Driver
 
-            <table id="driverTable">
+</button>
 
-                <thead>
+<button type="button" id="cancelDriver">
 
-                    <tr>
+Cancel
 
-                        <th>Name</th>
+</button>
 
-                        <th>License No.</th>
+</div>
 
-                        <th>Category</th>
+</div>
 
-                        <th>Expiry</th>
+<!-- Table -->
 
-                        <th>Contact</th>
+<div class="table-box">
 
-                        <th>Safety</th>
+<table id="driverTable">
 
-                        <th>Status</th>
+<thead>
 
-                        <th>Action</th>
+<tr>
 
-                    </tr>
+<th>Name</th>
 
-                </thead>
+<th>License</th>
 
-                <tbody>
+<th>Category</th>
 
-                </tbody>
+<th>Expiry</th>
 
-            </table>
+<th>Mobile</th>
 
-        </div>
+<th>Safety</th>
 
-    </main>
+<th>Status</th>
+
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+</tbody>
+
+</table>
+
+</div>
+
+</main>
 
 </div>
 
 <script src="assets/js/drivers.js"></script>
 
 </body>
+
 </html>

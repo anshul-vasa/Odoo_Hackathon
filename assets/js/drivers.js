@@ -1,109 +1,202 @@
-// =======================================
+// ==========================================
 // TransitOps Driver Management
-// =======================================
+// ==========================================
 
-const form = document.getElementById("driverForm");
-const addBtn = document.getElementById("addBtn");
-const cancelBtn = document.getElementById("cancel");
-const saveBtn = document.getElementById("saveDriver");
-
-const search = document.getElementById("search");
-const statusFilter = document.getElementById("statusFilter");
+// Local Storage
 
 let drivers = JSON.parse(localStorage.getItem("drivers")) || [];
+
 let editIndex = -1;
 
+// Elements
+
+const addDriverBtn = document.getElementById("addDriver");
+const cancelBtn = document.getElementById("cancelDriver");
+const saveBtn = document.getElementById("saveDriver");
+
+const driverBox = document.getElementById("driverBox");
+
+const searchInput = document.getElementById("searchDriver");
+const filterStatus = document.getElementById("filterStatus");
+
+// =============================
 // Show Form
-addBtn.onclick = () => {
-    form.style.display = "block";
+// =============================
+
+addDriverBtn.onclick = () => {
+
+    driverBox.style.display = "block";
+
+    document.getElementById("formTitle").innerHTML = "Add Driver";
+
     clearForm();
+
     editIndex = -1;
+
 };
 
+// =============================
 // Hide Form
+// =============================
+
 cancelBtn.onclick = () => {
-    form.style.display = "none";
+
+    driverBox.style.display = "none";
+
 };
 
+// =============================
 // Save Driver
-saveBtn.onclick = function () {
+// =============================
 
-    const driverName = document.getElementById("driverName").value.trim();
-    const licenseNumber = document.getElementById("licenseNumber").value.trim();
-    const licenseCategory = document.getElementById("licenseCategory").value.trim();
-    const licenseExpiry = document.getElementById("licenseExpiry").value;
-    const contactNumber = document.getElementById("contactNumber").value.trim();
-    const safetyScore = document.getElementById("safetyScore").value;
-    const status = document.getElementById("status").value;
+saveBtn.onclick = function(){
 
-    if (
-        driverName === "" ||
-        licenseNumber === "" ||
-        licenseCategory === "" ||
-        licenseExpiry === "" ||
-        contactNumber === "" ||
-        safetyScore === ""
-    ) {
+    const name =
+    document.getElementById("driverName").value.trim();
+
+    const license =
+    document.getElementById("licenseNo").value.trim();
+
+    const category =
+    document.getElementById("licenseCategory").value.trim();
+
+    const expiry =
+    document.getElementById("expiryDate").value;
+
+    const mobile =
+    document.getElementById("mobile").value.trim();
+
+    const safety =
+    Number(document.getElementById("safetyScore").value);
+
+    const status =
+    document.getElementById("driverStatus").value;
+
+    // Validation
+
+    if(
+        name=="" ||
+        license=="" ||
+        category=="" ||
+        expiry=="" ||
+        mobile==""
+    ){
+
         alert("Please fill all fields.");
+
         return;
+
     }
 
-    // License Number Unique
-    const duplicate = drivers.find((d, i) =>
-        d.licenseNumber.toLowerCase() === licenseNumber.toLowerCase() &&
-        i !== editIndex
-    );
+    if(mobile.length!=10){
 
-    if (duplicate) {
+        alert("Enter valid mobile number.");
+
+        return;
+
+    }
+
+    if(safety<0 || safety>100){
+
+        alert("Safety Score must be between 0-100");
+
+        return;
+
+    }
+
+    // Duplicate License
+
+    const duplicate = drivers.find((d,index)=>{
+
+        return d.license==license && index!=editIndex;
+
+    });
+
+    if(duplicate){
+
         alert("License Number already exists.");
+
         return;
+
     }
 
-    // Contact Validation
-    if (contactNumber.length != 10) {
-        alert("Enter valid 10 digit mobile number.");
+    // Date Validation
+
+    let today=new Date();
+
+    today.setHours(0,0,0,0);
+
+    let exp=new Date(expiry);
+
+    exp.setHours(0,0,0,0);
+
+    if(exp<today){
+
+        alert("License Expired");
+
         return;
+
     }
 
-    // Expiry Validation
-    const today = new Date();
-    const expiry = new Date(licenseExpiry);
+    const driver={
 
-    if (expiry < today) {
-        alert("Driver license has expired.");
-        return;
-    }
+        name,
 
-    const driver = {
-        driverName,
-        licenseNumber,
-        licenseCategory,
-        licenseExpiry,
-        contactNumber,
-        safetyScore,
+        license,
+
+        category,
+
+        expiry,
+
+        mobile,
+
+        safety,
+
         status
+
     };
 
-    if (editIndex === -1) {
+    if(editIndex==-1){
+
         drivers.push(driver);
-    } else {
-        drivers[editIndex] = driver;
+
     }
 
-    localStorage.setItem("drivers", JSON.stringify(drivers));
+    else{
 
-    renderTable();
+        drivers[editIndex]=driver;
+
+    }
+
+    localStorage.setItem(
+
+        "drivers",
+
+        JSON.stringify(drivers)
+
+    );
 
     clearForm();
 
-    form.style.display = "none";
+    driverBox.style.display="none";
+
+    renderDrivers();
+
 };
 
-// =========================
-// Render Table
-// =========================
 
-function renderTable() {
+
+
+
+
+
+
+
+// ==========================================
+// Render Driver Table
+// ==========================================
+
+function renderDrivers() {
 
     const tbody = document.querySelector("#driverTable tbody");
 
@@ -111,177 +204,259 @@ function renderTable() {
 
     let filtered = drivers.filter(driver => {
 
-        const searchMatch =
-            driver.driverName.toLowerCase().includes(search.value.toLowerCase()) ||
-            driver.licenseNumber.toLowerCase().includes(search.value.toLowerCase());
+        let searchMatch =
+            driver.name.toLowerCase().includes(searchInput.value.toLowerCase()) ||
+            driver.license.toLowerCase().includes(searchInput.value.toLowerCase());
 
-        const statusMatch =
-            statusFilter.value === "" ||
-            driver.status === statusFilter.value;
+        let statusMatch =
+            filterStatus.value == "" ||
+            driver.status == filterStatus.value;
 
         return searchMatch && statusMatch;
 
     });
 
-    if (filtered.length === 0) {
+    if(filtered.length==0){
 
-        tbody.innerHTML = `
+        tbody.innerHTML=`
+
         <tr>
+
             <td colspan="8" class="empty">
+
                 No Drivers Found
+
             </td>
-        </tr>`;
+
+        </tr>
+
+        `;
 
         return;
+
     }
 
-    filtered.forEach((driver, index) => {
+    filtered.forEach((driver,index)=>{
 
-        let statusClass = "";
+        let scoreClass="high";
 
-        switch (driver.status) {
+        if(driver.safety<80){
 
-            case "Available":
-                statusClass = "available";
-                break;
-
-            case "On Trip":
-                statusClass = "trip";
-                break;
-
-            case "Off Duty":
-                statusClass = "off";
-                break;
-
-            case "Suspended":
-                statusClass = "suspended";
-                break;
+            scoreClass="medium";
 
         }
 
-        let scoreClass = "high";
+        if(driver.safety<50){
 
-        if (driver.safetyScore < 80)
-            scoreClass = "medium";
+            scoreClass="low";
 
-        if (driver.safetyScore < 50)
-            scoreClass = "low";
+        }
 
-        tbody.innerHTML += `
+        let statusClass="available";
 
-<tr>
+        switch(driver.status){
 
-<td>${driver.driverName}</td>
+            case "On Trip":
 
-<td>${driver.licenseNumber}</td>
+                statusClass="trip";
 
-<td>${driver.licenseCategory}</td>
+                break;
 
-<td>${driver.licenseExpiry}</td>
+            case "Off Duty":
 
-<td>${driver.contactNumber}</td>
+                statusClass="off";
 
-<td>
-<span class="score ${scoreClass}">
-${driver.safetyScore}
-</span>
-</td>
+                break;
 
-<td>
-<span class="status ${statusClass}">
-${driver.status}
-</span>
-</td>
+            case "Suspended":
 
-<td>
+                statusClass="suspended";
 
-<button class="edit-btn"
-onclick="editDriver(${index})">
+                break;
 
-Edit
+            default:
 
-</button>
+                statusClass="available";
 
-<button class="delete-btn"
-onclick="deleteDriver(${index})">
+        }
 
-Delete
+        tbody.innerHTML+=`
 
-</button>
+        <tr>
 
-</td>
+            <td>${driver.name}</td>
 
-</tr>
+            <td>${driver.license}</td>
 
-`;
+            <td>${driver.category}</td>
+
+            <td>${driver.expiry}</td>
+
+            <td>${driver.mobile}</td>
+
+            <td>
+
+                <span class="score ${scoreClass}">
+
+                    ${driver.safety}
+
+                </span>
+
+            </td>
+
+            <td>
+
+                <span class="status ${statusClass}">
+
+                    ${driver.status}
+
+                </span>
+
+            </td>
+
+            <td>
+
+                <button
+                    class="edit-btn"
+                    onclick="editDriver(${index})">
+
+                    Edit
+
+                </button>
+
+                <button
+                    class="delete-btn"
+                    onclick="deleteDriver(${index})">
+
+                    Delete
+
+                </button>
+
+            </td>
+
+        </tr>
+
+        `;
 
     });
 
 }
 
-// =========================
-// Edit
-// =========================
+// ==========================================
+// Search
+// ==========================================
 
-function editDriver(index) {
+searchInput.addEventListener(
 
-    const driver = drivers[index];
+    "keyup",
+
+    renderDrivers
+
+);
+
+// ==========================================
+// Filter
+// ==========================================
+
+filterStatus.addEventListener(
+
+    "change",
+
+    renderDrivers
+
+);
+
+
+
+
+
+
+
+
+
+
+
+// ==========================================
+// Edit Driver
+// ==========================================
+
+function editDriver(index){
 
     editIndex = index;
 
-    form.style.display = "block";
+    const driver = drivers[index];
 
-    document.getElementById("driverName").value = driver.driverName;
-    document.getElementById("licenseNumber").value = driver.licenseNumber;
-    document.getElementById("licenseCategory").value = driver.licenseCategory;
-    document.getElementById("licenseExpiry").value = driver.licenseExpiry;
-    document.getElementById("contactNumber").value = driver.contactNumber;
-    document.getElementById("safetyScore").value = driver.safetyScore;
-    document.getElementById("status").value = driver.status;
+    driverBox.style.display = "block";
+
+    document.getElementById("formTitle").innerHTML = "Edit Driver";
+
+    document.getElementById("driverName").value = driver.name;
+
+    document.getElementById("licenseNo").value = driver.license;
+
+    document.getElementById("licenseCategory").value = driver.category;
+
+    document.getElementById("expiryDate").value = driver.expiry;
+
+    document.getElementById("mobile").value = driver.mobile;
+
+    document.getElementById("safetyScore").value = driver.safety;
+
+    document.getElementById("driverStatus").value = driver.status;
 
 }
 
-// =========================
-// Delete
-// =========================
 
-function deleteDriver(index) {
+// ==========================================
+// Delete Driver
+// ==========================================
 
-    if (confirm("Delete this driver?")) {
+function deleteDriver(index){
 
-        drivers.splice(index, 1);
+    if(confirm("Are you sure you want to delete this driver?")){
 
-        localStorage.setItem("drivers", JSON.stringify(drivers));
+        drivers.splice(index,1);
 
-        renderTable();
+        localStorage.setItem(
+
+            "drivers",
+
+            JSON.stringify(drivers)
+
+        );
+
+        renderDrivers();
 
     }
 
 }
 
-// =========================
+
+// ==========================================
 // Clear Form
-// =========================
+// ==========================================
 
-function clearForm() {
+function clearForm(){
 
-    document.getElementById("driverName").value = "";
-    document.getElementById("licenseNumber").value = "";
-    document.getElementById("licenseCategory").value = "";
-    document.getElementById("licenseExpiry").value = "";
-    document.getElementById("contactNumber").value = "";
-    document.getElementById("safetyScore").value = "";
+    document.getElementById("driverName").value="";
 
-    document.getElementById("status").selectedIndex = 0;
+    document.getElementById("licenseNo").value="";
+
+    document.getElementById("licenseCategory").value="";
+
+    document.getElementById("expiryDate").value="";
+
+    document.getElementById("mobile").value="";
+
+    document.getElementById("safetyScore").value="";
+
+    document.getElementById("driverStatus").selectedIndex=0;
 
 }
 
-// Search & Filter
 
-search.addEventListener("keyup", renderTable);
-
-statusFilter.addEventListener("change", renderTable);
-
+// ==========================================
 // Initial Load
+// ==========================================
 
-renderTable();
+renderDrivers();

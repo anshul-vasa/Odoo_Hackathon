@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Vehicle Registry</title>
+<title>Vehicle Registry | TransitOps</title>
 
 <link rel="stylesheet" href="assets/css/dashboard.css">
 <link rel="stylesheet" href="assets/css/vehicles.css">
@@ -36,11 +36,9 @@
 
 <li onclick="location.href='maintenance.html'">Maintenance</li>
 
-<li onclick="location.href='fuel.html'">Fuel & Expenses</li>
+<li onclick="location.href='fuel.html'">Fuel</li>
 
 <li onclick="location.href='reports.html'">Reports</li>
-
-<li onclick="location.href='wages.html'">Wages</li>
 
 </ul>
 
@@ -55,7 +53,9 @@
 <h1>Vehicle Registry</h1>
 
 <button id="addBtn">
+
 + Add Vehicle
+
 </button>
 
 </div>
@@ -67,25 +67,11 @@
 <input
 type="text"
 id="search"
-placeholder="Search Vehicle...">
-
-<select id="typeFilter">
-
-<option value="">Vehicle Type</option>
-
-<option>Truck</option>
-
-<option>Van</option>
-
-<option>Mini Truck</option>
-
-<option>Pickup</option>
-
-</select>
+placeholder="Search Vehicle">
 
 <select id="statusFilter">
 
-<option value="">Status</option>
+<option value="">All Status</option>
 
 <option>Available</option>
 
@@ -99,23 +85,29 @@ placeholder="Search Vehicle...">
 
 </div>
 
-<!-- Add Vehicle -->
+<!-- Form -->
 
-<div class="form-box" id="vehicleForm">
+<div
+class="form-box"
+id="vehicleForm">
 
-<h2>Add Vehicle</h2>
+<h2 id="title">
+
+Add Vehicle
+
+</h2>
 
 <div class="grid">
 
 <input
-type="text"
 id="regNo"
+type="text"
 placeholder="Registration Number">
 
 <input
-type="text"
 id="model"
-placeholder="Vehicle Name / Model">
+type="text"
+placeholder="Vehicle Model">
 
 <select id="type">
 
@@ -123,26 +115,21 @@ placeholder="Vehicle Name / Model">
 
 <option>Van</option>
 
-<option>Mini Truck</option>
-
 <option>Pickup</option>
+
+<option>Mini Truck</option>
 
 </select>
 
 <input
-type="number"
 id="capacity"
-placeholder="Maximum Load Capacity (KG)">
+type="number"
+placeholder="Load Capacity">
 
 <input
-type="number"
 id="odometer"
-placeholder="Current Odometer">
-
-<input
 type="number"
-id="cost"
-placeholder="Acquisition Cost">
+placeholder="Odometer">
 
 <select id="status">
 
@@ -160,19 +147,27 @@ placeholder="Acquisition Cost">
 
 <div class="buttons">
 
-<button id="saveVehicle">
+<button
+type="button"
+id="save">
+
 Save Vehicle
+
 </button>
 
-<button id="cancel">
+<button
+type="button"
+id="cancel">
+
 Cancel
+
 </button>
 
 </div>
 
 </div>
 
-<!-- Vehicle Table -->
+<!-- Table -->
 
 <div class="table-box">
 
@@ -182,7 +177,7 @@ Cancel
 
 <tr>
 
-<th>Reg No</th>
+<th>Registration</th>
 
 <th>Model</th>
 
@@ -191,8 +186,6 @@ Cancel
 <th>Capacity</th>
 
 <th>Odometer</th>
-
-<th>Cost</th>
 
 <th>Status</th>
 
@@ -203,8 +196,6 @@ Cancel
 </thead>
 
 <tbody>
-
-<!-- Dynamic -->
 
 </tbody>
 
@@ -219,4 +210,5 @@ Cancel
 <script src="assets/js/vehicles.js"></script>
 
 </body>
+
 </html>
