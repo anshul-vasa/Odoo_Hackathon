@@ -1,31 +1,31 @@
-// =======================================
+// ==========================================
 // TransitOps Vehicle Registry
-// Part 1
-// =======================================
+// ==========================================
+
+// Local Storage
 
 let vehicles = JSON.parse(localStorage.getItem("vehicles")) || [];
+
 let editIndex = -1;
 
-// =====================
 // Elements
-// =====================
 
-const form = document.getElementById("vehicleForm");
-
-const addBtn = document.getElementById("addBtn");
-const saveBtn = document.getElementById("save");
+const addVehicleBtn = document.getElementById("addBtn");
 const cancelBtn = document.getElementById("cancel");
+const saveBtn = document.getElementById("save");
 
-const search = document.getElementById("search");
+const vehicleForm = document.getElementById("vehicleForm");
+
+const searchInput = document.getElementById("search");
 const statusFilter = document.getElementById("statusFilter");
 
-// =====================
-// Open Form
-// =====================
+// =============================
+// Show Form
+// =============================
 
-addBtn.onclick = function () {
+addVehicleBtn.onclick = () => {
 
-    form.style.display = "block";
+    vehicleForm.style.display = "block";
 
     document.getElementById("title").innerHTML = "Add Vehicle";
 
@@ -35,42 +35,48 @@ addBtn.onclick = function () {
 
 };
 
-// =====================
-// Close Form
-// =====================
+// =============================
+// Hide Form
+// =============================
 
-cancelBtn.onclick = function () {
+cancelBtn.onclick = () => {
 
-    form.style.display = "none";
+    vehicleForm.style.display = "none";
 
 };
 
-// =====================
+// =============================
 // Save Vehicle
-// =====================
+// =============================
 
-saveBtn.onclick = function () {
+saveBtn.onclick = function(){
 
-    const regNo = document.getElementById("regNo").value.trim().toUpperCase();
+    const regNo =
+    document.getElementById("regNo").value.trim().toUpperCase();
 
-    const model = document.getElementById("model").value.trim();
+    const model =
+    document.getElementById("model").value.trim();
 
-    const type = document.getElementById("type").value;
+    const type =
+    document.getElementById("type").value;
 
-    const capacity = document.getElementById("capacity").value;
+    const capacity =
+    document.getElementById("capacity").value;
 
-    const odometer = document.getElementById("odometer").value;
+    const odometer =
+    document.getElementById("odometer").value;
 
-    const status = document.getElementById("status").value;
+    const status =
+    document.getElementById("status").value;
 
     // Validation
 
-    if (
-        regNo == "" ||
-        model == "" ||
-        capacity == "" ||
-        odometer == ""
-    ) {
+    if(
+        regNo=="" ||
+        model=="" ||
+        capacity=="" ||
+        odometer==""
+    ){
 
         alert("Please fill all fields.");
 
@@ -78,20 +84,17 @@ saveBtn.onclick = function () {
 
     }
 
-    // Registration Duplicate
+    // Duplicate Registration
 
-    const duplicate = vehicles.find((v, index) => {
+    const duplicate = vehicles.find((v,index)=>{
 
-    return (
-        v.regNo.trim().toUpperCase() === regNo.trim().toUpperCase() &&
-        index !== editIndex
-    );
+        return v.regNo==regNo && index!=editIndex;
 
-});
+    });
 
-    if (duplicate) {
+    if(duplicate){
 
-        alert("Registration Number Already Exists");
+        alert("Registration Number already exists.");
 
         return;
 
@@ -101,7 +104,7 @@ saveBtn.onclick = function () {
 
     const pattern = /^[A-Z]{2}[0-9]{2}[A-Z]{1,2}[0-9]{4}$/;
 
-    if (!pattern.test(regNo)) {
+    if(!pattern.test(regNo)){
 
         alert("Invalid Registration Number");
 
@@ -109,9 +112,9 @@ saveBtn.onclick = function () {
 
     }
 
-    // Capacity
+    // Capacity Validation
 
-    if (Number(capacity) <= 0) {
+    if(Number(capacity)<=0){
 
         alert("Invalid Capacity");
 
@@ -119,9 +122,9 @@ saveBtn.onclick = function () {
 
     }
 
-    // Odometer
+    // Odometer Validation
 
-    if (Number(odometer) < 0) {
+    if(Number(odometer)<0){
 
         alert("Invalid Odometer");
 
@@ -129,7 +132,7 @@ saveBtn.onclick = function () {
 
     }
 
-    const vehicle = {
+    const vehicle={
 
         regNo,
 
@@ -145,13 +148,15 @@ saveBtn.onclick = function () {
 
     };
 
-    if (editIndex == -1) {
+    if(editIndex==-1){
 
         vehicles.push(vehicle);
 
-    } else {
+    }
 
-        vehicles[editIndex] = vehicle;
+    else{
+
+        vehicles[editIndex]=vehicle;
 
     }
 
@@ -163,57 +168,57 @@ saveBtn.onclick = function () {
 
     );
 
-    renderTable();
-
     clearForm();
 
-    form.style.display = "none";
+    vehicleForm.style.display="none";
+
+    renderVehicles();
 
 };
 
-// =====================
-// Render Table
-// =====================
 
-function renderTable() {
+
+
+
+// ==========================================
+// Render Vehicle Table
+// ==========================================
+
+function renderVehicles() {
 
     const tbody = document.querySelector("#vehicleTable tbody");
 
     tbody.innerHTML = "";
 
-    const filtered = vehicles.filter(vehicle => {
+    let filtered = vehicles.filter(vehicle => {
 
-        const searchMatch =
+        let searchMatch =
+            vehicle.regNo.toLowerCase().includes(searchInput.value.toLowerCase()) ||
+            vehicle.model.toLowerCase().includes(searchInput.value.toLowerCase());
 
-            vehicle.model.toLowerCase().includes(search.value.toLowerCase()) ||
-
-            vehicle.regNo.toLowerCase().includes(search.value.toLowerCase());
-
-        const statusMatch =
-
+        let statusMatch =
             statusFilter.value == "" ||
-
             vehicle.status == statusFilter.value;
 
         return searchMatch && statusMatch;
 
     });
 
-    if (filtered.length == 0) {
+    if(filtered.length == 0){
 
         tbody.innerHTML = `
 
-<tr>
+        <tr>
 
-<td colspan="7" class="empty">
+            <td colspan="7" class="empty">
 
-No Vehicles Found
+                No Vehicles Found
 
-</td>
+            </td>
 
-</tr>
+        </tr>
 
-`;
+        `;
 
         return;
 
@@ -221,194 +226,154 @@ No Vehicles Found
 
     filtered.forEach(vehicle => {
 
-        const originalIndex = vehicles.findIndex(v =>
-
-            v.regNo == vehicle.regNo
-
-        );
+        const originalIndex = vehicles.findIndex(v => v.regNo === vehicle.regNo);
 
         let statusClass = "available";
 
-        switch (vehicle.status) {
+        switch(vehicle.status){
 
             case "On Trip":
-
                 statusClass = "trip";
-
                 break;
 
             case "In Shop":
-
                 statusClass = "shop";
-
                 break;
 
             case "Retired":
-
                 statusClass = "retired";
-
                 break;
+
+            default:
+                statusClass = "available";
 
         }
 
         tbody.innerHTML += `
 
-<tr>
+        <tr>
 
-<td>${vehicle.regNo}</td>
+            <td>${vehicle.regNo}</td>
 
-<td>${vehicle.model}</td>
+            <td>${vehicle.model}</td>
 
-<td>${vehicle.type}</td>
+            <td>${vehicle.type}</td>
 
-<td>${vehicle.capacity} KG</td>
+            <td>${vehicle.capacity} KG</td>
 
-<td>${vehicle.odometer} KM</td>
+            <td>${vehicle.odometer} KM</td>
 
-<td>
+            <td>
 
-<span class="status ${statusClass}">
+                <span class="status ${statusClass}">
 
-${vehicle.status}
+                    ${vehicle.status}
 
-</span>
+                </span>
 
-</td>
+            </td>
 
-<td>
+            <td>
 
-<button
+                <button
+                class="edit-btn"
+                onclick="editVehicle(${originalIndex})">
 
-class="edit-btn"
+                Edit
 
-onclick="editVehicle(${originalIndex})">
+                </button>
 
-Edit
+                <button
+                class="delete-btn"
+                onclick="deleteVehicle(${originalIndex})">
 
-</button>
+                Delete
 
-<button
+                </button>
 
-class="delete-btn"
+            </td>
 
-onclick="deleteVehicle(${originalIndex})">
+        </tr>
 
-Delete
-
-</button>
-
-</td>
-
-</tr>
-
-`;
+        `;
 
     });
 
 }
 
-// =====================
-// Search
-// =====================
-
-search.addEventListener(
-
-    "keyup",
-
-    renderTable
-
-);
-
-// =====================
-// Status Filter
-// =====================
-
-statusFilter.addEventListener(
-
-    "change",
-
-    renderTable
-
-);
-
-
-
-
-
-// =====================
+// ==========================================
 // Edit Vehicle
-// =====================
+// ==========================================
 
-function editVehicle(index) {
+function editVehicle(index){
 
     editIndex = index;
 
     const vehicle = vehicles[index];
 
-    if (!vehicle) return;
-
-    form.style.display = "block";
+    vehicleForm.style.display = "block";
 
     document.getElementById("title").innerHTML = "Edit Vehicle";
 
     document.getElementById("regNo").value = vehicle.regNo;
-
     document.getElementById("model").value = vehicle.model;
-
     document.getElementById("type").value = vehicle.type;
-
     document.getElementById("capacity").value = vehicle.capacity;
-
     document.getElementById("odometer").value = vehicle.odometer;
-
     document.getElementById("status").value = vehicle.status;
 
 }
 
-// =====================
+// ==========================================
 // Delete Vehicle
-// =====================
+// ==========================================
 
-function deleteVehicle(index) {
+function deleteVehicle(index){
 
-    if (!confirm("Delete this vehicle?")) return;
+    if(confirm("Delete this vehicle?")){
 
-    vehicles.splice(index, 1);
+        vehicles.splice(index,1);
 
-    localStorage.setItem(
+        localStorage.setItem(
 
-        "vehicles",
+            "vehicles",
 
-        JSON.stringify(vehicles)
+            JSON.stringify(vehicles)
 
-    );
+        );
 
-    renderTable();
+        renderVehicles();
+
+    }
 
 }
 
-// =====================
+// ==========================================
 // Clear Form
-// =====================
+// ==========================================
 
-function clearForm() {
+function clearForm(){
 
     document.getElementById("regNo").value = "";
-
     document.getElementById("model").value = "";
-
     document.getElementById("capacity").value = "";
-
     document.getElementById("odometer").value = "";
 
     document.getElementById("type").selectedIndex = 0;
-
     document.getElementById("status").selectedIndex = 0;
 
 }
 
-// =====================
-// Initial Load
-// =====================
+// ==========================================
+// Search & Filter
+// ==========================================
 
-renderTable();
+searchInput.addEventListener("keyup", renderVehicles);
+
+statusFilter.addEventListener("change", renderVehicles);
+
+// ==========================================
+// Initial Load
+// ==========================================
+
+renderVehicles();

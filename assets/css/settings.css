@@ -1,0 +1,183 @@
+/* ==========================================
+   SETTINGS PAGE
+========================================== */
+
+.page-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:30px;
+}
+
+.page-header h1{
+    color:#fff;
+    font-size:32px;
+    font-weight:700;
+}
+
+#saveSettings{
+
+    background:#2563eb;
+    color:#fff;
+    border:none;
+    padding:14px 28px;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:15px;
+    font-weight:600;
+    transition:.3s;
+
+}
+
+#saveSettings:hover{
+
+    background:#1d4ed8;
+    transform:translateY(-2px);
+
+}
+
+/* ===========================
+   Layout
+=========================== */
+
+.settings-grid{
+
+    display:grid;
+    grid-template-columns:1fr 1.4fr;
+    gap:25px;
+
+}
+
+/* ===========================
+   Cards
+=========================== */
+
+.card{
+
+    background:#1f2937;
+    border-radius:12px;
+    padding:25px;
+    box-shadow:0 10px 25px rgba(0,0,0,.25);
+
+}
+
+.card h2{
+
+    color:#fff;
+    margin-bottom:20px;
+    font-size:22px;
+
+}
+
+/* ===========================
+   Form
+=========================== */
+
+.card label{
+
+    display:block;
+    margin-top:15px;
+    margin-bottom:8px;
+    color:#d1d5db;
+    font-size:14px;
+
+}
+
+.card input,
+.card select{
+
+    width:100%;
+    padding:12px;
+    border-radius:8px;
+    border:1px solid #374151;
+    background:#111827;
+    color:white;
+    outline:none;
+
+}
+
+.card input:focus,
+.card select:focus{
+
+    border-color:#2563eb;
+
+}
+
+/* ===========================
+   Table
+=========================== */
+
+table{
+
+    width:100%;
+    border-collapse:collapse;
+
+}
+
+thead{
+
+    background:#111827;
+
+}
+
+thead th{
+
+    color:white;
+    padding:14px;
+    text-align:center;
+
+}
+
+tbody td{
+
+    padding:14px;
+    text-align:center;
+    color:#d1d5db;
+    border-top:1px solid #374151;
+
+}
+
+tbody tr:hover{
+
+    background:#273548;
+
+}
+
+/* ===========================
+   Responsive
+=========================== */
+
+@media(max-width:1000px){
+
+.settings-grid{
+
+grid-template-columns:1fr;
+
+}
+
+table{
+
+display:block;
+overflow-x:auto;
+
+}
+
+}
+
+@media(max-width:700px){
+
+.page-header{
+
+flex-direction:column;
+align-items:flex-start;
+gap:15px;
+
+}
+
+#saveSettings{
+
+width:100%;
+
+}
+
+}

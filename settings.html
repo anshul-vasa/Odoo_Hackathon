@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Settings | TransitOps</title>
+
+<link rel="stylesheet" href="assets/css/dashboard.css">
+<link rel="stylesheet" href="assets/css/settings.css">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- Sidebar -->
+
+ <aside class="sidebar">
+
+<h2 class="logo">🚚 TransitOps</h2>
+
+<ul>
+
+<li onclick="location.href='dashboard.html'">Dashboard</li>
+
+<li onclick="location.href='vehicles.html'">Fleet</li>
+
+<li onclick="location.href='drivers.html'">Drivers</li>
+
+<li onclick="location.href='trips.html'">Trips</li>
+
+<li onclick="location.href='maintenance.html'">Maintenance</li>
+
+<li onclick="location.href='fuel.html'">Fuel & Expenses</li>
+
+<li onclick="location.href='reports.html'">Reports</li>
+
+<li onclick="location.href='wages.html'">Wages</li>
+
+<li class="active">Settings</li>
+
+</ul>
+
+</aside>
+
+<!-- Main -->
+
+<main class="main">
+
+<div class="page-header">
+
+<h1>System Settings</h1>
+
+<button id="saveSettings">
+Save Changes
+</button>
+
+</div>
+
+<div class="settings-grid">
+
+<!-- General -->
+
+<div class="card">
+
+<h2>General</h2>
+
+<label>Depot Name</label>
+<input type="text" id="depot" value="Grounding Depot">
+
+<label>Currency</label>
+
+<select id="currency">
+<option>INR (₹)</option>
+<option>USD ($)</option>
+<option>EUR (€)</option>
+</select>
+
+<label>Distance Unit</label>
+
+<select id="distance">
+<option>Kilometers</option>
+<option>Miles</option>
+</select>
+
+<label>Theme</label>
+
+<select id="theme">
+<option>Dark</option>
+<option>Light</option>
+</select>
+
+</div>
+
+<!-- RBAC -->
+
+<div class="card">
+
+<h2>Role Based Access</h2>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Role</th>
+
+<th>Fleet</th>
+
+<th>Drivers</th>
+
+<th>Trips</th>
+
+<th>Fuel</th>
+
+<th>Reports</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+<tr>
+<td>Fleet Manager</td>
+<td>✔</td>
+<td>✔</td>
+<td>✔</td>
+<td>✔</td>
+<td>✔</td>
+</tr>
+
+<tr>
+<td>Dispatcher</td>
+<td>View</td>
+<td>—</td>
+<td>✔</td>
+<td>—</td>
+<td>—</td>
+</tr>
+
+<tr>
+<td>Safety Officer</td>
+<td>—</td>
+<td>✔</td>
+<td>View</td>
+<td>—</td>
+<td>—</td>
+</tr>
+
+<tr>
+<td>Financial Analyst</td>
+<td>View</td>
+<td>—</td>
+<td>—</td>
+<td>✔</td>
+<td>✔</td>
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</main>
+
+</div>
+
+<script src="assets/js/settings.js"></script>
+
+</body>
+</html>
