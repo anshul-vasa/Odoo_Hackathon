@@ -3,7 +3,7 @@
  * Safe to re-run — skips records that already exist (by unique key), except
  * the bulk-scale section (30 vehicles/drivers, 40-60 trips, fuel/expense/
  * maintenance history) which only runs once, gated on the presence of
- * "Van-101" (the first bulk-seeded vehicle) so re-running never duplicates it.
+ * "DL-2100" (the first bulk-seeded driver) so re-running never duplicates it.
  */
 import { db } from "../src/lib/db";
 import { hashPassword } from "../src/lib/auth";
@@ -55,30 +55,30 @@ function toSqlDatetime(iso: string) {
 }
 
 async function ensureUser(name: string, email: string, role: Role, password: string) {
-  if (getUserByEmail(email)) {
+  if (await getUserByEmail(email)) {
     console.log(`  user ${email} already exists, skipping`);
     return;
   }
   const passwordHash = await hashPassword(password);
-  createUser({ name, email, passwordHash, role });
+  await createUser({ name, email, passwordHash, role });
   console.log(`  created ${role} -> ${email} / ${password}`);
 }
 
-function ensureVehicle(input: Parameters<typeof createVehicle>[0]) {
-  if (getVehicleByRegistration(input.registrationNumber)) {
+async function ensureVehicle(input: Parameters<typeof createVehicle>[0]) {
+  if (await getVehicleByRegistration(input.registrationNumber)) {
     console.log(`  vehicle ${input.registrationNumber} already exists, skipping`);
     return;
   }
-  createVehicle(input);
+  await createVehicle(input);
   console.log(`  created vehicle ${input.registrationNumber}`);
 }
 
-function ensureDriver(input: Parameters<typeof createDriver>[0]) {
-  if (getDriverByLicenseNumber(input.licenseNumber)) {
+async function ensureDriver(input: Parameters<typeof createDriver>[0]) {
+  if (await getDriverByLicenseNumber(input.licenseNumber)) {
     console.log(`  driver ${input.licenseNumber} already exists, skipping`);
     return;
   }
-  createDriver(input);
+  await createDriver(input);
   console.log(`  created driver ${input.name}`);
 }
 
@@ -110,7 +110,7 @@ async function main() {
   await ensureUser("Raj Finance", "financial.analyst@transitops.demo", "FINANCIAL_ANALYST", "password123");
 
   console.log("Seeding core demo vehicles (spec's example workflow)...");
-  ensureVehicle({
+  await ensureVehicle({
     registrationNumber: "Van-05",
     name: "Van-05",
     type: "Van",
@@ -121,7 +121,7 @@ async function main() {
     insuranceExpiry: daysFromNowIso(200),
     pucExpiry: daysFromNowIso(90),
   });
-  ensureVehicle({
+  await ensureVehicle({
     registrationNumber: "Truck-11",
     name: "Truck-11",
     type: "Truck",
@@ -132,7 +132,7 @@ async function main() {
     insuranceExpiry: daysFromNowIso(200),
     pucExpiry: daysFromNowIso(90),
   });
-  ensureVehicle({
+  await ensureVehicle({
     registrationNumber: "Van-12",
     name: "Van-12",
     type: "Van",
@@ -143,7 +143,7 @@ async function main() {
     insuranceExpiry: daysFromNowIso(200),
     pucExpiry: daysFromNowIso(90),
   });
-  ensureVehicle({
+  await ensureVehicle({
     registrationNumber: "Truck-02",
     name: "Truck-02",
     type: "Truck",
@@ -159,7 +159,7 @@ async function main() {
   const inOneYear = daysFromNowIso(365);
   const lastYear = daysAgoIso(365);
 
-  ensureDriver({
+  await ensureDriver({
     name: "Alex",
     licenseNumber: "DL-1001",
     licenseCategory: "LMV",
@@ -167,7 +167,7 @@ async function main() {
     contactNumber: "555-0101",
     safetyScore: 95,
   });
-  ensureDriver({
+  await ensureDriver({
     name: "Bianca",
     licenseNumber: "DL-1002",
     licenseCategory: "HMV",
@@ -175,7 +175,7 @@ async function main() {
     contactNumber: "555-0102",
     safetyScore: 88,
   });
-  ensureDriver({
+  await ensureDriver({
     name: "Carlos (expired license — for demoing the block)",
     licenseNumber: "DL-1003",
     licenseCategory: "LMV",
@@ -192,7 +192,7 @@ async function main() {
   // using one as a re-run guard would only work by luck and could otherwise
   // silently duplicate trips/fuel/maintenance/challans on a second run.
   // License numbers are assigned deterministically by index, so this is safe.
-  if (getDriverByLicenseNumber("DL-2100")) {
+  if (await getDriverByLicenseNumber("DL-2100")) {
     console.log("Bulk demo data already seeded, skipping.");
     console.log("Done.");
     return;
@@ -210,7 +210,7 @@ async function main() {
     const retired = i % 17 === 0; // a couple of retired vehicles for realism
     const insuranceSoon = i % 9 === 0; // some expiring within ~a month, for expiry-alert demo
     const pucSoon = i % 11 === 0;
-    ensureVehicle({
+    await ensureVehicle({
       registrationNumber: reg,
       name: `${type} ${101 + i}`,
       type,
@@ -224,8 +224,8 @@ async function main() {
       fastagBalance: Math.round(rand(50, 3000)),
     });
     if (retired) {
-      const v = getVehicleByRegistration(reg);
-      if (v) setVehicleStatus(v.id, "RETIRED");
+      const v = await getVehicleByRegistration(reg);
+      if (v) await setVehicleStatus(v.id, "RETIRED");
     }
   }
 
@@ -242,7 +242,7 @@ async function main() {
       : expiringSoon
         ? daysFromNowIso(randInt(3, 28))
         : daysFromNowIso(randInt(90, 700));
-    ensureDriver({
+    await ensureDriver({
       name,
       licenseNumber: license,
       licenseCategory: pick(["LMV", "HMV", "LMV", "HMV", "MCWG"]),
@@ -254,9 +254,9 @@ async function main() {
   }
   // Suspend a couple of drivers for the Safety Officer dashboard demo.
   for (const license of bulkDriverLicenses.slice(0, 3)) {
-    const d = getDriverByLicenseNumber(license);
+    const d = await getDriverByLicenseNumber(license);
     if (d) {
-      db.prepare("UPDATE drivers SET status = 'SUSPENDED' WHERE id = ?").run(d.id);
+      await db.prepare("UPDATE drivers SET status = 'SUSPENDED' WHERE id = ?").run(d.id);
     }
   }
 
@@ -268,8 +268,9 @@ async function main() {
 
   while (created < tripCount && attempts < maxAttempts) {
     attempts++;
-    const availableVehicles = listVehicles({ status: "AVAILABLE" });
-    const availableDrivers = listDrivers({ status: "AVAILABLE" }).filter(
+    const availableVehicles = await listVehicles({ status: "AVAILABLE" });
+    const allAvailableDrivers = await listDrivers({ status: "AVAILABLE" });
+    const availableDrivers = allAvailableDrivers.filter(
       (d) => new Date(d.license_expiry_date).getTime() > Date.now()
     );
     if (availableVehicles.length === 0 || availableDrivers.length === 0) break;
@@ -284,7 +285,7 @@ async function main() {
 
     let trip;
     try {
-      trip = createTrip({
+      trip = await createTrip({
         source,
         destination,
         vehicleId: vehicle.id,
@@ -302,32 +303,32 @@ async function main() {
 
     if (outcome < 0.5) {
       // Completed trip, backdated realistically.
-      dispatchTrip(trip.id);
+      await dispatchTrip(trip.id);
       const actualDistance = Math.round(plannedDistance * rand(0.9, 1.12));
       const fuelConsumed = Math.round(actualDistance * rand(0.08, 0.18) * 10) / 10;
-      completeTrip(trip.id, { actualDistance, fuelConsumed });
+      await completeTrip(trip.id, { actualDistance, fuelConsumed });
       const dispatchedIso = daysAgoIso(Math.max(backdatedDays - 1, 0));
       const completedIso = daysAgoIso(Math.max(backdatedDays - 2, 0));
-      db.prepare(
+      await db.prepare(
         "UPDATE trips SET created_at = ?, dispatched_at = ?, completed_at = ? WHERE id = ?"
       ).run(toSqlDatetime(createdIso), toSqlDatetime(dispatchedIso), toSqlDatetime(completedIso), trip.id);
     } else if (outcome < 0.68) {
       // Currently dispatched (in progress) — keep it recent.
-      dispatchTrip(trip.id);
+      await dispatchTrip(trip.id);
       const recentIso = daysAgoIso(randInt(0, 2));
-      db.prepare("UPDATE trips SET created_at = ?, dispatched_at = ? WHERE id = ?").run(
+      await db.prepare("UPDATE trips SET created_at = ?, dispatched_at = ? WHERE id = ?").run(
         toSqlDatetime(recentIso),
         toSqlDatetime(recentIso),
         trip.id
       );
     } else if (outcome < 0.85) {
       // Cancelled after dispatch, or straight from draft.
-      if (Math.random() < 0.5) dispatchTrip(trip.id);
-      cancelTrip(trip.id);
-      db.prepare("UPDATE trips SET created_at = ? WHERE id = ?").run(toSqlDatetime(createdIso), trip.id);
+      if (Math.random() < 0.5) await dispatchTrip(trip.id);
+      await cancelTrip(trip.id);
+      await db.prepare("UPDATE trips SET created_at = ? WHERE id = ?").run(toSqlDatetime(createdIso), trip.id);
     } else {
       // Left as Draft/pending.
-      db.prepare("UPDATE trips SET created_at = ? WHERE id = ?").run(toSqlDatetime(createdIso), trip.id);
+      await db.prepare("UPDATE trips SET created_at = ? WHERE id = ?").run(toSqlDatetime(createdIso), trip.id);
     }
 
     created++;
@@ -335,7 +336,7 @@ async function main() {
   console.log(`  created ${created} trips`);
 
   console.log("Seeding fuel logs and expenses...");
-  const allVehicles = listVehicles();
+  const allVehicles = await listVehicles();
   let fuelCount = 0;
   let expenseCount = 0;
   for (const v of allVehicles) {
@@ -344,12 +345,12 @@ async function main() {
     for (let i = 0; i < logsForVehicle; i++) {
       const liters = Math.round(rand(15, 120) * 10) / 10;
       const cost = Math.round(liters * rand(90, 105));
-      createFuelLog({ vehicleId: v.id, liters, cost, date: toSqlDatetime(daysAgoIso(randInt(0, 29))) });
+      await createFuelLog({ vehicleId: v.id, liters, cost, date: toSqlDatetime(daysAgoIso(randInt(0, 29))) });
       fuelCount++;
     }
     if (Math.random() < 0.35) {
       const types = ["Toll", "Permit Renewal", "Driver Allowance", "Parking", "Insurance Premium"];
-      createExpense({
+      await createExpense({
         vehicleId: v.id,
         type: pick(types),
         amount: Math.round(rand(500, 15000)),
@@ -363,7 +364,7 @@ async function main() {
 
   console.log("Seeding maintenance records...");
   let maintenanceCount = 0;
-  const stillAvailable = listVehicles({ status: "AVAILABLE" });
+  const stillAvailable = await listVehicles({ status: "AVAILABLE" });
   const maintenanceTargets = stillAvailable.slice(0, Math.min(15, stillAvailable.length));
   const descriptions = [
     "Routine oil change and filter replacement",
@@ -376,19 +377,19 @@ async function main() {
     "Electrical wiring inspection",
   ];
   for (const v of maintenanceTargets) {
-    const record = createMaintenanceRecord({
+    const record = await createMaintenanceRecord({
       vehicleId: v.id,
       description: pick(descriptions),
       cost: Math.round(rand(800, 25000)),
     });
     const backdated = toSqlDatetime(daysAgoIso(randInt(2, 25)));
-    db.prepare("UPDATE maintenance_records SET created_at = ? WHERE id = ?").run(backdated, record.id);
+    await db.prepare("UPDATE maintenance_records SET created_at = ? WHERE id = ?").run(backdated, record.id);
     maintenanceCount++;
     // Close about 2/3 of them so some vehicles are back to Available and some remain In Shop.
     if (Math.random() < 0.66) {
-      closeMaintenanceRecord(record.id);
+      await closeMaintenanceRecord(record.id);
       const closedIso = toSqlDatetime(daysAgoIso(randInt(0, 1)));
-      db.prepare("UPDATE maintenance_records SET closed_at = ? WHERE id = ?").run(closedIso, record.id);
+      await db.prepare("UPDATE maintenance_records SET closed_at = ? WHERE id = ?").run(closedIso, record.id);
     }
   }
   console.log(`  created ${maintenanceCount} maintenance records`);
@@ -397,8 +398,9 @@ async function main() {
   const challanTargets = allVehicles.filter((v) => v.status !== "RETIRED").slice(0, 6);
   const reasons = ["Overspeeding", "No parking zone", "Signal jump", "Lane violation", "Overloading"];
   let challanCount = 0;
-  challanTargets.forEach((v, i) => {
-    const challan = createChallan({
+  for (let i = 0; i < challanTargets.length; i++) {
+    const v = challanTargets[i];
+    const challan = await createChallan({
       vehicleId: v.id,
       challanNumber: `CH-${new Date().getFullYear()}-${1000 + i}`,
       reason: pick(reasons),
@@ -407,9 +409,9 @@ async function main() {
     challanCount++;
     // Leave roughly half pending, half already paid, for a realistic mix.
     if (i % 2 === 0) {
-      db.prepare("UPDATE challans SET status = 'PAID', paid_date = datetime('now') WHERE id = ?").run(challan.id);
+      await db.prepare("UPDATE challans SET status = 'PAID', paid_date = datetime('now') WHERE id = ?").run(challan.id);
     }
-  });
+  }
   console.log(`  created ${challanCount} challans`);
 
   console.log("Done.");

@@ -17,7 +17,7 @@ export async function GET(
   try {
     const session = await requireSession(req);
     requireCan(session.role, "trips", "read");
-    const invoice = getInvoiceByTripId(params.id);
+    const invoice = await getInvoiceByTripId(params.id);
     return apiOk({ invoice: invoice ?? null });
   } catch (err) {
     return apiError(err);
@@ -32,7 +32,7 @@ export async function POST(
     const session = await requireSession(req);
     requireCan(session.role, "trips", "write");
     const body = CreateInvoiceSchema.parse(await req.json());
-    const invoice = createInvoice({ tripId: params.id, ...body });
+    const invoice = await createInvoice({ tripId: params.id, ...body });
     return apiOk({ invoice }, 201);
   } catch (err) {
     return apiError(err);

@@ -10,7 +10,7 @@ export async function POST(
   try {
     const session = await requireSession(req);
     requireCan(session.role, "maintenance", "write");
-    const record = closeMaintenanceRecord(params.id);
+    const record = await closeMaintenanceRecord(params.id);
     return apiOk({ record });
   } catch (err) {
     return apiError(err);

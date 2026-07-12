@@ -19,13 +19,13 @@ export default async function TripDetailPage({
   const session = await getServerSession();
   if (!session) redirect("/login");
 
-  const trip = getTripById(params.id);
+  const trip = await getTripById(params.id);
   if (!trip) notFound();
 
-  const vehicle = getVehicleById(trip.vehicle_id);
-  const driver = getDriverById(trip.driver_id);
-  const invoice = getInvoiceByTripId(trip.id) ?? null;
-  const challans = vehicle ? listChallans(vehicle.id) : [];
+  const vehicle = await getVehicleById(trip.vehicle_id);
+  const driver = await getDriverById(trip.driver_id);
+  const invoice = await getInvoiceByTripId(trip.id) ?? null;
+  const challans = vehicle ? await listChallans(vehicle.id) : [];
 
   return (
     <AppShell session={session}>

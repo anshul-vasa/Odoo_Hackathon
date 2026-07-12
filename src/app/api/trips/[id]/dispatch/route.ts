@@ -10,7 +10,7 @@ export async function POST(
   try {
     const session = await requireSession(req);
     requireCan(session.role, "trips", "write");
-    const trip = dispatchTrip(params.id);
+    const trip = await dispatchTrip(params.id);
     return apiOk({ trip });
   } catch (err) {
     return apiError(err);

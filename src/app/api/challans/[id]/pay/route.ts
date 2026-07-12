@@ -10,7 +10,7 @@ export async function POST(
   try {
     const session = await requireSession(req);
     requireCan(session.role, "vehicles", "write");
-    const challan = markChallanPaid(params.id);
+    const challan = await markChallanPaid(params.id);
     return apiOk({ challan });
   } catch (err) {
     return apiError(err);

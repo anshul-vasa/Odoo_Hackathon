@@ -8,7 +8,7 @@ export interface VehicleFilters {
   region?: string;
 }
 
-export function listVehicles(filters: VehicleFilters = {}): Vehicle[] {
+export async function listVehicles(filters: VehicleFilters = {}): Promise<Vehicle[]> {
   const clauses: string[] = [];
   const params: (string | number | null)[] = [];
 
@@ -27,23 +27,23 @@ export function listVehicles(filters: VehicleFilters = {}): Vehicle[] {
 
   const where = clauses.length ? `WHERE ${clauses.join(" AND ")}` : "";
   return toRows<Vehicle>(
-    db.prepare(`SELECT * FROM vehicles ${where} ORDER BY created_at DESC`).all(...params)
+    await db.prepare(`SELECT * FROM vehicles ${where} ORDER BY created_at DESC`).all(...params)
   );
 }
 
-export function getVehicleById(id: string): Vehicle | undefined {
-  return toRow<Vehicle>(db.prepare("SELECT * FROM vehicles WHERE id = ?").get(id));
+export async function getVehicleById(id: string): Promise<Vehicle | undefined> {
+  return toRow<Vehicle>(await db.prepare("SELECT * FROM vehicles WHERE id = ?").get(id));
 }
 
-export function getVehicleByRegistration(
+export async function getVehicleByRegistration(
   registrationNumber: string
-): Vehicle | undefined {
+): Promise<Vehicle | undefined> {
   return toRow<Vehicle>(
-    db.prepare("SELECT * FROM vehicles WHERE registration_number = ?").get(registrationNumber)
+    await db.prepare("SELECT * FROM vehicles WHERE registration_number = ?").get(registrationNumber)
   );
 }
 
-export function createVehicle(input: {
+export async function createVehicle(input: {
   registrationNumber: string;
   name: string;
   type: string;
@@ -56,9 +56,9 @@ export function createVehicle(input: {
   pucExpiry?: string | null;
   fastagId?: string | null;
   fastagBalance?: number | null;
-}): Vehicle {
+}): Promise<Vehicle> {
   const id = newId("veh");
-  db.prepare(
+  await db.prepare(
     `INSERT INTO vehicles
       (id, registration_number, name, type, max_load_capacity, odometer, acquisition_cost, region, chassis_number, insurance_expiry, puc_expiry, fastag_id, fastag_balance, status)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'AVAILABLE')`
@@ -77,10 +77,10 @@ export function createVehicle(input: {
     input.fastagId ?? null,
     input.fastagBalance ?? 0
   );
-  return getVehicleById(id)!;
+  return (await getVehicleById(id))!;
 }
 
-export function updateVehicle(
+export async function updateVehicle(
   id: string,
   input: Partial<{
     name: string;
@@ -96,7 +96,7 @@ export function updateVehicle(
     fastagBalance: number | null;
     status: VehicleStatus;
   }>
-): Vehicle | undefined {
+): Promise<Vehicle | undefined> {
   const fields: string[] = [];
   const params: (string | number | null)[] = [];
 
@@ -126,16 +126,16 @@ export function updateVehicle(
   fields.push("updated_at = datetime('now')");
   params.push(id);
 
-  db.prepare(`UPDATE vehicles SET ${fields.join(", ")} WHERE id = ?`).run(...params);
+  await db.prepare(`UPDATE vehicles SET ${fields.join(", ")} WHERE id = ?`).run(...params);
   return getVehicleById(id);
 }
 
-export function setVehicleStatus(id: string, status: VehicleStatus): void {
-  db.prepare(
+export async function setVehicleStatus(id: string, status: VehicleStatus): Promise<void> {
+  await db.prepare(
     "UPDATE vehicles SET status = ?, updated_at = datetime('now') WHERE id = ?"
   ).run(status, id);
 }
 
-export function deleteVehicle(id: string): void {
-  db.prepare("DELETE FROM vehicles WHERE id = ?").run(id);
+export async function deleteVehicle(id: string): Promise<void> {
+  await db.prepare("DELETE FROM vehicles WHERE id = ?").run(id);
 }

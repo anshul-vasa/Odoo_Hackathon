@@ -6,20 +6,23 @@ import { FuelLogForm } from "@/components/FuelLogForm";
 import { ExpenseForm } from "@/components/ExpenseForm";
 import { listFuelLogs } from "@/lib/repositories/fuel";
 import { listExpenses } from "@/lib/repositories/expenses";
-import { listVehicles, getVehicleById } from "@/lib/repositories/vehicles";
+import { listVehicles } from "@/lib/repositories/vehicles";
 import { can } from "@/lib/rbac";
 
 export default async function FuelExpensesPage() {
   const session = await getServerSession();
   if (!session) redirect("/login");
 
-  const fuelLogs = listFuelLogs();
-  const expenses = listExpenses();
-  const vehicles = listVehicles({ status: undefined });
+  const fuelLogs = await listFuelLogs();
+  const expenses = await listExpenses();
+  const vehicles = await listVehicles({ status: undefined });
   const canWrite = can(session.role, "fuel", "write");
 
   const totalFuelCost = fuelLogs.reduce((s, f) => s + f.cost, 0);
   const totalExpenseCost = expenses.reduce((s, e) => s + e.amount, 0);
+
+  const vehicleRegById = new Map<string, string>();
+  for (const v of vehicles) vehicleRegById.set(v.id, v.registration_number);
 
   return (
     <AppShell session={session}>
@@ -51,7 +54,7 @@ export default async function FuelExpensesPage() {
                   {fuelLogs.map((f) => (
                     <tr key={f.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
                       <td className="px-4 py-3 font-medium text-slate-900 dark:text-white">
-                        {getVehicleById(f.vehicle_id)?.registration_number ?? "—"}
+                        {vehicleRegById.get(f.vehicle_id) ?? "—"}
                       </td>
                       <td className="px-4 py-3 text-slate-700 dark:text-slate-300">{f.liters} L</td>
                       <td className="px-4 py-3 text-slate-700 dark:text-slate-300">₹{f.cost.toLocaleString()}</td>
@@ -88,7 +91,7 @@ export default async function FuelExpensesPage() {
                   {expenses.map((e) => (
                     <tr key={e.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
                       <td className="px-4 py-3 font-medium text-slate-900 dark:text-white">
-                        {getVehicleById(e.vehicle_id)?.registration_number ?? "—"}
+                        {vehicleRegById.get(e.vehicle_id) ?? "—"}
                       </td>
                       <td className="px-4 py-3 text-slate-700 dark:text-slate-300">{e.type}</td>
                       <td className="px-4 py-3 text-slate-700 dark:text-slate-300">₹{e.amount.toLocaleString()}</td>

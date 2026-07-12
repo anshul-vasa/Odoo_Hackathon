@@ -31,7 +31,8 @@ export async function POST(req: NextRequest) {
     let successCount = 0;
     const errors: { row: number; message: string }[] = [];
 
-    rows.forEach((raw, idx) => {
+    for (let idx = 0; idx < rows.length; idx++) {
+      const raw = rows[idx];
       const rowNum = idx + 2;
       try {
         const name = str(raw.name ?? raw["Name"]);
@@ -48,11 +49,11 @@ export async function POST(req: NextRequest) {
           throw new Error("Missing or invalid license expiry date.");
         }
         if (!contactNumber) throw new Error("Missing contact number.");
-        if (getDriverByLicenseNumber(licenseNumber)) {
+        if (await getDriverByLicenseNumber(licenseNumber)) {
           throw new Error(`License number ${licenseNumber} already exists.`);
         }
 
-        createDriver({
+        await createDriver({
           name,
           licenseNumber,
           licenseCategory,
@@ -64,7 +65,7 @@ export async function POST(req: NextRequest) {
       } catch (err) {
         errors.push({ row: rowNum, message: err instanceof Error ? err.message : "Unknown error." });
       }
-    });
+    }
 
     return apiOk({ successCount, errorCount: errors.length, errors });
   } catch (err) {

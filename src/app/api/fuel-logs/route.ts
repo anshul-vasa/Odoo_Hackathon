@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
     requireCan(session.role, "fuel", "read");
     const { searchParams } = new URL(req.url);
     const vehicleId = searchParams.get("vehicleId") ?? undefined;
-    const logs = listFuelLogs(vehicleId);
+    const logs = await listFuelLogs(vehicleId);
     return apiOk({ logs });
   } catch (err) {
     return apiError(err);
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     const session = await requireSession(req);
     requireCan(session.role, "fuel", "write");
     const body = CreateFuelLogSchema.parse(await req.json());
-    const log = createFuelLog(body);
+    const log = await createFuelLog(body);
     return apiOk({ log }, 201);
   } catch (err) {
     return apiError(err);

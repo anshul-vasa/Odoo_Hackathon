@@ -5,22 +5,26 @@ import { PageHeader } from "@/components/PageHeader";
 import { MaintenanceForm } from "@/components/MaintenanceForm";
 import { MaintenanceTable, type MaintenanceRowData } from "@/components/tables/MaintenanceTable";
 import { listMaintenanceRecords } from "@/lib/repositories/maintenance";
-import { listVehicles, getVehicleById } from "@/lib/repositories/vehicles";
+import { listVehicles } from "@/lib/repositories/vehicles";
 import { can } from "@/lib/rbac";
 
 export default async function MaintenancePage() {
   const session = await getServerSession();
   if (!session) redirect("/login");
 
-  const records = listMaintenanceRecords();
-  const eligibleVehicles = listVehicles().filter(
+  const records = await listMaintenanceRecords();
+  const allVehicles = await listVehicles();
+  const eligibleVehicles = allVehicles.filter(
     (v) => v.status !== "ON_TRIP" && v.status !== "RETIRED"
   );
   const canWrite = can(session.role, "maintenance", "write");
 
+  const vehicleRegById = new Map<string, string>();
+  for (const v of allVehicles) vehicleRegById.set(v.id, v.registration_number);
+
   const rows: MaintenanceRowData[] = records.map((r) => ({
     id: r.id,
-    vehicleReg: getVehicleById(r.vehicle_id)?.registration_number ?? "—",
+    vehicleReg: vehicleRegById.get(r.vehicle_id) ?? "—",
     description: r.description,
     cost: r.cost,
     created_at: r.created_at,

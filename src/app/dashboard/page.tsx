@@ -16,9 +16,9 @@ export default async function DashboardPage() {
   const session = await getServerSession();
   if (!session) redirect("/login");
 
-  const vehicles = listVehicles();
-  const drivers = listDrivers();
-  const trips = listTrips();
+  const vehicles = await listVehicles();
+  const drivers = await listDrivers();
+  const trips = await listTrips();
 
   return (
     <AppShell session={session}>
@@ -33,9 +33,9 @@ export default async function DashboardPage() {
       {session.role === "FINANCIAL_ANALYST" && (
         <FinancialAnalystDashboard
           vehicles={vehicles}
-          fuelLogs={listFuelLogs()}
-          expenses={listExpenses()}
-          maintenanceRecords={listMaintenanceRecords()}
+          fuelLogs={await listFuelLogs()}
+          expenses={await listExpenses()}
+          maintenanceRecords={await listMaintenanceRecords()}
         />
       )}
 

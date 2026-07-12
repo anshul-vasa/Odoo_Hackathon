@@ -27,7 +27,7 @@ export async function GET(
   try {
     const session = await requireSession(req);
     requireCan(session.role, "drivers", "read");
-    const driver = getDriverById(params.id);
+    const driver = await getDriverById(params.id);
     if (!driver) throw new NotFoundError("Driver not found.");
     return apiOk({ driver });
   } catch (err) {
@@ -43,12 +43,12 @@ export async function PATCH(
     const session = await requireSession(req);
     requireCan(session.role, "drivers", "write");
 
-    const existing = getDriverById(params.id);
+    const existing = await getDriverById(params.id);
     if (!existing) throw new NotFoundError("Driver not found.");
 
     const body = UpdateDriverSchema.parse(await req.json());
     if (body.licenseNumber && body.licenseNumber !== existing.license_number) {
-      const clash = getDriverByLicenseNumber(body.licenseNumber);
+      const clash = await getDriverByLicenseNumber(body.licenseNumber);
       if (clash) {
         throw new ValidationError(
           `License number ${body.licenseNumber} is already registered.`
@@ -56,7 +56,7 @@ export async function PATCH(
       }
     }
 
-    const driver = updateDriver(params.id, body);
+    const driver = await updateDriver(params.id, body);
     return apiOk({ driver });
   } catch (err) {
     return apiError(err);
@@ -70,9 +70,9 @@ export async function DELETE(
   try {
     const session = await requireSession(req);
     requireCan(session.role, "drivers", "write");
-    const existing = getDriverById(params.id);
+    const existing = await getDriverById(params.id);
     if (!existing) throw new NotFoundError("Driver not found.");
-    deleteDriver(params.id);
+    await deleteDriver(params.id);
     return apiOk({ ok: true });
   } catch (err) {
     return apiError(err);

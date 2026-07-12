@@ -17,7 +17,7 @@ export async function GET(
   try {
     const session = await requireSession(req);
     requireCan(session.role, "vehicles", "read");
-    const challans = listChallans(params.id);
+    const challans = await listChallans(params.id);
     return apiOk({ challans });
   } catch (err) {
     return apiError(err);
@@ -32,7 +32,7 @@ export async function POST(
     const session = await requireSession(req);
     requireCan(session.role, "vehicles", "write");
     const body = CreateChallanSchema.parse(await req.json());
-    const challan = createChallan({ vehicleId: params.id, ...body });
+    const challan = await createChallan({ vehicleId: params.id, ...body });
     return apiOk({ challan }, 201);
   } catch (err) {
     return apiError(err);

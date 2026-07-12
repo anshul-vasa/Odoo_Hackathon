@@ -6,7 +6,7 @@ export interface DriverFilters {
   status?: DriverStatus;
 }
 
-export function listDrivers(filters: DriverFilters = {}): Driver[] {
+export async function listDrivers(filters: DriverFilters = {}): Promise<Driver[]> {
   const clauses: string[] = [];
   const params: (string | number | null)[] = [];
 
@@ -17,21 +17,21 @@ export function listDrivers(filters: DriverFilters = {}): Driver[] {
 
   const where = clauses.length ? `WHERE ${clauses.join(" AND ")}` : "";
   return toRows<Driver>(
-    db.prepare(`SELECT * FROM drivers ${where} ORDER BY created_at DESC`).all(...params)
+    await db.prepare(`SELECT * FROM drivers ${where} ORDER BY created_at DESC`).all(...params)
   );
 }
 
-export function getDriverById(id: string): Driver | undefined {
-  return toRow<Driver>(db.prepare("SELECT * FROM drivers WHERE id = ?").get(id));
+export async function getDriverById(id: string): Promise<Driver | undefined> {
+  return toRow<Driver>(await db.prepare("SELECT * FROM drivers WHERE id = ?").get(id));
 }
 
-export function getDriverByLicenseNumber(licenseNumber: string): Driver | undefined {
+export async function getDriverByLicenseNumber(licenseNumber: string): Promise<Driver | undefined> {
   return toRow<Driver>(
-    db.prepare("SELECT * FROM drivers WHERE license_number = ?").get(licenseNumber)
+    await db.prepare("SELECT * FROM drivers WHERE license_number = ?").get(licenseNumber)
   );
 }
 
-export function createDriver(input: {
+export async function createDriver(input: {
   name: string;
   licenseNumber: string;
   licenseCategory: string;
@@ -39,9 +39,9 @@ export function createDriver(input: {
   contactNumber: string;
   safetyScore?: number;
   userId?: string | null;
-}): Driver {
+}): Promise<Driver> {
   const id = newId("drv");
-  db.prepare(
+  await db.prepare(
     `INSERT INTO drivers
       (id, name, license_number, license_category, license_expiry_date, contact_number, safety_score, status, user_id)
      VALUES (?, ?, ?, ?, ?, ?, ?, 'AVAILABLE', ?)`
@@ -55,10 +55,10 @@ export function createDriver(input: {
     input.safetyScore ?? 100,
     input.userId ?? null
   );
-  return getDriverById(id)!;
+  return (await getDriverById(id))!;
 }
 
-export function updateDriver(
+export async function updateDriver(
   id: string,
   input: Partial<{
     name: string;
@@ -69,7 +69,7 @@ export function updateDriver(
     safetyScore: number;
     status: DriverStatus;
   }>
-): Driver | undefined {
+): Promise<Driver | undefined> {
   const fields: string[] = [];
   const params: (string | number | null)[] = [];
 
@@ -94,18 +94,18 @@ export function updateDriver(
   fields.push("updated_at = datetime('now')");
   params.push(id);
 
-  db.prepare(`UPDATE drivers SET ${fields.join(", ")} WHERE id = ?`).run(...params);
+  await db.prepare(`UPDATE drivers SET ${fields.join(", ")} WHERE id = ?`).run(...params);
   return getDriverById(id);
 }
 
-export function setDriverStatus(id: string, status: DriverStatus): void {
-  db.prepare(
+export async function setDriverStatus(id: string, status: DriverStatus): Promise<void> {
+  await db.prepare(
     "UPDATE drivers SET status = ?, updated_at = datetime('now') WHERE id = ?"
   ).run(status, id);
 }
 
-export function deleteDriver(id: string): void {
-  db.prepare("DELETE FROM drivers WHERE id = ?").run(id);
+export async function deleteDriver(id: string): Promise<void> {
+  await db.prepare("DELETE FROM drivers WHERE id = ?").run(id);
 }
 
 export function isLicenseExpired(driver: Driver, at: Date = new Date()): boolean {

@@ -58,18 +58,18 @@ function makeDriver(overrides: Partial<Parameters<typeof createDriver>[0]> = {})
   });
 }
 
-function getVehicleRow(id: string) {
+async function getVehicleRow(id: string) {
   return db.prepare("SELECT * FROM vehicles WHERE id = ?").get(id) as any;
 }
-function getDriverRow(id: string) {
+async function getDriverRow(id: string) {
   return db.prepare("SELECT * FROM drivers WHERE id = ?").get(id) as any;
 }
 
-test("the spec's exact example workflow: create -> dispatch -> complete", () => {
-  const vehicle = makeVehicle({ maxLoadCapacity: 500 });
-  const driver = makeDriver();
+test("the spec's exact example workflow: create -> dispatch -> complete", async () => {
+  const vehicle = await makeVehicle({ maxLoadCapacity: 500 });
+  const driver = await makeDriver();
 
-  const trip = createTrip({
+  const trip = await createTrip({
     source: "Ahmedabad",
     destination: "Surat",
     vehicleId: vehicle.id,
@@ -79,25 +79,25 @@ test("the spec's exact example workflow: create -> dispatch -> complete", () => 
   });
   assert.equal(trip.status, "DRAFT");
 
-  dispatchTrip(trip.id);
-  assert.equal(getTripById(trip.id)!.status, "DISPATCHED");
-  assert.equal(getVehicleRow(vehicle.id).status, "ON_TRIP");
-  assert.equal(getDriverRow(driver.id).status, "ON_TRIP");
+  await dispatchTrip(trip.id);
+  assert.equal((await getTripById(trip.id))!.status, "DISPATCHED");
+  assert.equal((await getVehicleRow(vehicle.id)).status, "ON_TRIP");
+  assert.equal((await getDriverRow(driver.id)).status, "ON_TRIP");
 
-  completeTrip(trip.id, { actualDistance: 118, fuelConsumed: 15 });
-  const completed = getTripById(trip.id)!;
+  await completeTrip(trip.id, { actualDistance: 118, fuelConsumed: 15 });
+  const completed = (await getTripById(trip.id))!;
   assert.equal(completed.status, "COMPLETED");
-  assert.equal(getVehicleRow(vehicle.id).status, "AVAILABLE");
-  assert.equal(getDriverRow(driver.id).status, "AVAILABLE");
+  assert.equal((await getVehicleRow(vehicle.id)).status, "AVAILABLE");
+  assert.equal((await getDriverRow(driver.id)).status, "AVAILABLE");
   // Odometer should have advanced by the actual distance entered.
-  assert.equal(getVehicleRow(vehicle.id).odometer, 118);
+  assert.equal((await getVehicleRow(vehicle.id)).odometer, 118);
 });
 
-test("rejects cargo weight over the vehicle's max load capacity", () => {
-  const vehicle = makeVehicle({ maxLoadCapacity: 500 });
-  const driver = makeDriver();
+test("rejects cargo weight over the vehicle's max load capacity", async () => {
+  const vehicle = await makeVehicle({ maxLoadCapacity: 500 });
+  const driver = await makeDriver();
 
-  assert.throws(
+  await assert.rejects(
     () =>
       createTrip({
         source: "A",
@@ -111,11 +111,11 @@ test("rejects cargo weight over the vehicle's max load capacity", () => {
   );
 });
 
-test("rejects a driver with an expired license", () => {
-  const vehicle = makeVehicle();
-  const driver = makeDriver({ licenseExpiryDate: pastDate() });
+test("rejects a driver with an expired license", async () => {
+  const vehicle = await makeVehicle();
+  const driver = await makeDriver({ licenseExpiryDate: pastDate() });
 
-  assert.throws(
+  await assert.rejects(
     () =>
       createTrip({
         source: "A",
@@ -129,12 +129,12 @@ test("rejects a driver with an expired license", () => {
   );
 });
 
-test("rejects a suspended driver", () => {
-  const vehicle = makeVehicle();
-  const driver = makeDriver();
-  setDriverStatus(driver.id, "SUSPENDED");
+test("rejects a suspended driver", async () => {
+  const vehicle = await makeVehicle();
+  const driver = await makeDriver();
+  await setDriverStatus(driver.id, "SUSPENDED");
 
-  assert.throws(
+  await assert.rejects(
     () =>
       createTrip({
         source: "A",
@@ -148,12 +148,12 @@ test("rejects a suspended driver", () => {
   );
 });
 
-test("blocks assigning a vehicle that is already on a trip", () => {
-  const vehicle = makeVehicle();
-  const driver1 = makeDriver();
-  const driver2 = makeDriver();
+test("blocks assigning a vehicle that is already on a trip", async () => {
+  const vehicle = await makeVehicle();
+  const driver1 = await makeDriver();
+  const driver2 = await makeDriver();
 
-  const trip1 = createTrip({
+  const trip1 = await createTrip({
     source: "A",
     destination: "B",
     vehicleId: vehicle.id,
@@ -161,9 +161,9 @@ test("blocks assigning a vehicle that is already on a trip", () => {
     cargoWeight: 100,
     plannedDistance: 10,
   });
-  dispatchTrip(trip1.id);
+  await dispatchTrip(trip1.id);
 
-  assert.throws(
+  await assert.rejects(
     () =>
       createTrip({
         source: "A",
@@ -177,15 +177,15 @@ test("blocks assigning a vehicle that is already on a trip", () => {
   );
 });
 
-test("blocks assigning a retired or in-shop vehicle", () => {
-  const retiredVehicle = makeVehicle();
-  setVehicleStatus(retiredVehicle.id, "RETIRED");
-  const inShopVehicle = makeVehicle();
-  setVehicleStatus(inShopVehicle.id, "IN_SHOP");
-  const driver = makeDriver();
+test("blocks assigning a retired or in-shop vehicle", async () => {
+  const retiredVehicle = await makeVehicle();
+  await setVehicleStatus(retiredVehicle.id, "RETIRED");
+  const inShopVehicle = await makeVehicle();
+  await setVehicleStatus(inShopVehicle.id, "IN_SHOP");
+  const driver = await makeDriver();
 
   for (const vehicle of [retiredVehicle, inShopVehicle]) {
-    assert.throws(
+    await assert.rejects(
       () =>
         createTrip({
           source: "A",
@@ -200,10 +200,10 @@ test("blocks assigning a retired or in-shop vehicle", () => {
   }
 });
 
-test("cancelling a Draft trip does not change vehicle/driver status", () => {
-  const vehicle = makeVehicle();
-  const driver = makeDriver();
-  const trip = createTrip({
+test("cancelling a Draft trip does not change vehicle/driver status", async () => {
+  const vehicle = await makeVehicle();
+  const driver = await makeDriver();
+  const trip = await createTrip({
     source: "A",
     destination: "B",
     vehicleId: vehicle.id,
@@ -212,17 +212,17 @@ test("cancelling a Draft trip does not change vehicle/driver status", () => {
     plannedDistance: 10,
   });
 
-  cancelTrip(trip.id);
+  await cancelTrip(trip.id);
 
-  assert.equal(getVehicleRow(vehicle.id).status, "AVAILABLE");
-  assert.equal(getDriverRow(driver.id).status, "AVAILABLE");
-  assert.equal(getTripById(trip.id)!.status, "CANCELLED");
+  assert.equal((await getVehicleRow(vehicle.id)).status, "AVAILABLE");
+  assert.equal((await getDriverRow(driver.id)).status, "AVAILABLE");
+  assert.equal((await getTripById(trip.id))!.status, "CANCELLED");
 });
 
-test("cancelling a Dispatched trip reverts vehicle and driver to Available", () => {
-  const vehicle = makeVehicle();
-  const driver = makeDriver();
-  const trip = createTrip({
+test("cancelling a Dispatched trip reverts vehicle and driver to Available", async () => {
+  const vehicle = await makeVehicle();
+  const driver = await makeDriver();
+  const trip = await createTrip({
     source: "A",
     destination: "B",
     vehicleId: vehicle.id,
@@ -230,34 +230,34 @@ test("cancelling a Dispatched trip reverts vehicle and driver to Available", () 
     cargoWeight: 100,
     plannedDistance: 10,
   });
-  dispatchTrip(trip.id);
+  await dispatchTrip(trip.id);
 
-  cancelTrip(trip.id);
+  await cancelTrip(trip.id);
 
-  assert.equal(getVehicleRow(vehicle.id).status, "AVAILABLE");
-  assert.equal(getDriverRow(driver.id).status, "AVAILABLE");
+  assert.equal((await getVehicleRow(vehicle.id)).status, "AVAILABLE");
+  assert.equal((await getDriverRow(driver.id)).status, "AVAILABLE");
 });
 
-test("opening a maintenance record switches the vehicle to In Shop; closing restores Available", () => {
-  const vehicle = makeVehicle();
-  assert.equal(getVehicleRow(vehicle.id).status, "AVAILABLE");
+test("opening a maintenance record switches the vehicle to In Shop; closing restores Available", async () => {
+  const vehicle = await makeVehicle();
+  assert.equal((await getVehicleRow(vehicle.id)).status, "AVAILABLE");
 
-  const record = createMaintenanceRecord({ vehicleId: vehicle.id, description: "Oil change", cost: 500 });
-  assert.equal(getVehicleRow(vehicle.id).status, "IN_SHOP");
+  const record = await createMaintenanceRecord({ vehicleId: vehicle.id, description: "Oil change", cost: 500 });
+  assert.equal((await getVehicleRow(vehicle.id)).status, "IN_SHOP");
 
-  closeMaintenanceRecord(record.id);
-  assert.equal(getVehicleRow(vehicle.id).status, "AVAILABLE");
+  await closeMaintenanceRecord(record.id);
+  assert.equal((await getVehicleRow(vehicle.id)).status, "AVAILABLE");
 });
 
-test("closing maintenance never un-retires a vehicle", () => {
-  const vehicle = makeVehicle();
-  const record = createMaintenanceRecord({ vehicleId: vehicle.id, description: "Engine work", cost: 5000 });
+test("closing maintenance never un-retires a vehicle", async () => {
+  const vehicle = await makeVehicle();
+  const record = await createMaintenanceRecord({ vehicleId: vehicle.id, description: "Engine work", cost: 5000 });
   // Vehicle is retired *while* the maintenance record is still open.
-  setVehicleStatus(vehicle.id, "RETIRED");
+  await setVehicleStatus(vehicle.id, "RETIRED");
 
-  closeMaintenanceRecord(record.id);
+  await closeMaintenanceRecord(record.id);
 
-  assert.equal(getVehicleRow(vehicle.id).status, "RETIRED");
+  assert.equal((await getVehicleRow(vehicle.id)).status, "RETIRED");
 });
 
 test("RBAC: role permission matrix matches the spec's role descriptions", () => {

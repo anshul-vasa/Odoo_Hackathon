@@ -5,11 +5,7 @@ plug in their modules.
 
 ## Requirements
 
-- **Node.js >= 22.5** (see `.nvmrc`). This project uses Node's built-in
-  `node:sqlite` instead of Prisma or `better-sqlite3` — deliberately: it needs
-  zero native-binary downloads and zero external engine downloads, so it works
-  identically on every teammate's machine (and on any restricted-network CI).
-  If your Node is older, `nvm install 22 && nvm use 22`.
+- **Node.js >= 22** (see `.nvmrc`). If your Node is older, `nvm install 22 && nvm use 22`.
 
 ## Setup
 
@@ -141,15 +137,49 @@ figure). The Reports screen shows a cost-recovery ratio instead
 
 ## Data layer
 
-SQLite via `node:sqlite` (`src/lib/db.ts`), schema in `db/schema.sql`, applied
-automatically on first connection (with lightweight `ALTER TABLE` migrations
-for columns added after the fact — see `runMigrations` in `db.ts`, safe to
-re-run, and `TRANSITOPS_DB_PATH` env var to point the test suite at a
-throwaway file). Repository functions live in `src/lib/repositories/*.ts` —
-plain functions, no ORM magic. All rows are normalized to plain objects via
-`toRow`/`toRows` before leaving the data layer (needed because `node:sqlite`
-returns null-prototype objects, which Next.js refuses to pass to Client
-Components).
+SQLite dialect via `@libsql/client` (`src/lib/db.ts`), schema in
+`db/schema.sql`, applied automatically on first connection (with lightweight
+`ALTER TABLE` migrations for columns added after the fact — see the
+`MIGRATIONS` list in `db.ts`, safe to re-run, and `TRANSITOPS_DB_PATH` env var
+to point the test suite at a throwaway file). Repository functions live in
+`src/lib/repositories/*.ts` — plain async functions, no ORM magic.
+
+Two modes, chosen automatically:
+
+- **Local file** (default): `data/transitops.db`, zero setup, used for local
+  dev, this repo's own sandboxed testing, and `npm test`. No account needed.
+- **Remote Turso database**: used automatically whenever
+  `TURSO_DATABASE_URL` (and `TURSO_AUTH_TOKEN`) are set — this is what
+  production on Netlify needs, since Netlify Functions don't have a
+  persistent local filesystem. See "Deploying to Netlify" below.
+
+`db.ts` exports a small `db.prepare(sql).get/all/run(...)` shim so every
+repository function reads like the familiar synchronous SQLite API, just
+`await`ed.
+
+## Deploying to Netlify
+
+The app is Netlify-ready — Next.js API routes and server components become
+Netlify Functions automatically (`netlify.toml` + the auto-installed
+`@netlify/plugin-nextjs`). The **one thing only you can do** is provision a
+database Netlify's serverless functions can actually reach, since they don't
+keep a local file around between invocations:
+
+1. Create a free database at [turso.tech](https://turso.tech) (or via the
+   `turso` CLI: `turso db create transitops` then `turso db show transitops`
+   and `turso db tokens create transitops`).
+2. In Netlify's site settings → **Environment variables**, add:
+   - `TURSO_DATABASE_URL` — the `libsql://...` URL from step 1.
+   - `TURSO_AUTH_TOKEN` — the auth token from step 1.
+3. Deploy. On first request, the app applies `db/schema.sql` and the
+   migrations to that Turso database automatically — no manual migration
+   step, no separate seeding required (run `TURSO_DATABASE_URL=... TURSO_AUTH_TOKEN=... npm run seed`
+   once from your machine if you want the same demo data live).
+
+Without those two variables set, the app still runs fine locally/in a single
+long-lived server (falls back to the local `data/transitops.db` file) — they
+only become necessary the moment it's deployed somewhere with an ephemeral
+filesystem, like Netlify.
 
 ## RBAC matrix
 

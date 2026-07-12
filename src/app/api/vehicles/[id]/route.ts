@@ -33,7 +33,7 @@ export async function GET(
   try {
     const session = await requireSession(req);
     requireCan(session.role, "vehicles", "read");
-    const vehicle = getVehicleById(params.id);
+    const vehicle = await getVehicleById(params.id);
     if (!vehicle) throw new NotFoundError("Vehicle not found.");
     return apiOk({ vehicle });
   } catch (err) {
@@ -49,7 +49,7 @@ export async function PATCH(
     const session = await requireSession(req);
     requireCan(session.role, "vehicles", "write");
 
-    const existing = getVehicleById(params.id);
+    const existing = await getVehicleById(params.id);
     if (!existing) throw new NotFoundError("Vehicle not found.");
 
     const body = UpdateVehicleSchema.parse(await req.json());
@@ -57,7 +57,7 @@ export async function PATCH(
       body.registrationNumber &&
       body.registrationNumber !== existing.registration_number
     ) {
-      const clash = getVehicleByRegistration(body.registrationNumber);
+      const clash = await getVehicleByRegistration(body.registrationNumber);
       if (clash) {
         throw new ValidationError(
           `Registration number ${body.registrationNumber} is already in use.`
@@ -65,7 +65,7 @@ export async function PATCH(
       }
     }
 
-    const vehicle = updateVehicle(params.id, body);
+    const vehicle = await updateVehicle(params.id, body);
     return apiOk({ vehicle });
   } catch (err) {
     return apiError(err);
@@ -79,9 +79,9 @@ export async function DELETE(
   try {
     const session = await requireSession(req);
     requireCan(session.role, "vehicles", "write");
-    const existing = getVehicleById(params.id);
+    const existing = await getVehicleById(params.id);
     if (!existing) throw new NotFoundError("Vehicle not found.");
-    deleteVehicle(params.id);
+    await deleteVehicle(params.id);
     return apiOk({ ok: true });
   } catch (err) {
     return apiError(err);

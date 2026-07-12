@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
     const session = await requireSession(req);
     requireCan(session.role, "trips", "read");
     const { searchParams } = new URL(req.url);
-    const trips = listTrips({
+    const trips = await listTrips({
       status: (searchParams.get("status") as any) ?? undefined,
     });
     return apiOk({ trips });
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
     const session = await requireSession(req);
     requireCan(session.role, "trips", "write");
     const body = CreateTripSchema.parse(await req.json());
-    const trip = createTrip(body);
+    const trip = await createTrip(body);
     return apiOk({ trip }, 201);
   } catch (err) {
     return apiError(err);

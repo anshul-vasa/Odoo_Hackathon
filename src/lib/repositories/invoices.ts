@@ -24,23 +24,23 @@ function ewayValidityDays(distanceKm: number): number {
   return Math.max(1, Math.ceil(distanceKm / 200));
 }
 
-export function getInvoiceByTripId(tripId: string): Invoice | undefined {
-  return toRow<Invoice>(db.prepare("SELECT * FROM invoices WHERE trip_id = ?").get(tripId));
+export async function getInvoiceByTripId(tripId: string): Promise<Invoice | undefined> {
+  return toRow<Invoice>(await db.prepare("SELECT * FROM invoices WHERE trip_id = ?").get(tripId));
 }
 
-export function getInvoiceById(id: string): Invoice | undefined {
-  return toRow<Invoice>(db.prepare("SELECT * FROM invoices WHERE id = ?").get(id));
+export async function getInvoiceById(id: string): Promise<Invoice | undefined> {
+  return toRow<Invoice>(await db.prepare("SELECT * FROM invoices WHERE id = ?").get(id));
 }
 
-export function createInvoice(input: {
+export async function createInvoice(input: {
   tripId: string;
   taxableAmount: number;
   gstRate: number;
   taxType: TaxType;
-}): Invoice {
-  const trip = getTripById(input.tripId);
+}): Promise<Invoice> {
+  const trip = await getTripById(input.tripId);
   if (!trip) throw new NotFoundError("Trip not found.");
-  if (getInvoiceByTripId(input.tripId)) {
+  if (await getInvoiceByTripId(input.tripId)) {
     throw new ConflictError("An invoice already exists for this trip.");
   }
   if (input.taxableAmount <= 0) {
@@ -62,7 +62,7 @@ export function createInvoice(input: {
   validUntil.setDate(validUntil.getDate() + ewayValidityDays(distance));
 
   const id = newId("inv");
-  db.prepare(
+  await db.prepare(
     `INSERT INTO invoices
       (id, trip_id, invoice_number, taxable_amount, gst_rate, tax_type, cgst_amount, sgst_amount, igst_amount, total_amount, eway_bill_number, eway_bill_valid_until, eway_bill_required)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
@@ -81,5 +81,5 @@ export function createInvoice(input: {
     validUntil.toISOString(),
     ewayRequired ? 1 : 0
   );
-  return getInvoiceById(id)!;
+  return (await getInvoiceById(id))!;
 }

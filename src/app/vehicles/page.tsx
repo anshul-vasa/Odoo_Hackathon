@@ -12,7 +12,7 @@ export default async function VehiclesPage() {
   const session = await getServerSession();
   if (!session) redirect("/login");
 
-  const vehicles = listVehicles();
+  const vehicles = await listVehicles();
   const canWrite = can(session.role, "vehicles", "write");
 
   return (

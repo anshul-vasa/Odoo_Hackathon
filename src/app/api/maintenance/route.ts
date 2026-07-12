@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
     requireCan(session.role, "maintenance", "read");
     const { searchParams } = new URL(req.url);
     const vehicleId = searchParams.get("vehicleId") ?? undefined;
-    const records = listMaintenanceRecords(vehicleId);
+    const records = await listMaintenanceRecords(vehicleId);
     return apiOk({ records });
   } catch (err) {
     return apiError(err);
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
     const session = await requireSession(req);
     requireCan(session.role, "maintenance", "write");
     const body = CreateMaintenanceSchema.parse(await req.json());
-    const record = createMaintenanceRecord(body);
+    const record = await createMaintenanceRecord(body);
     return apiOk({ record }, 201);
   } catch (err) {
     return apiError(err);

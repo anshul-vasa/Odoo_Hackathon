@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
     requireCan(session.role, "vehicles", "read");
 
     const { searchParams } = new URL(req.url);
-    const vehicles = listVehicles({
+    const vehicles = await listVehicles({
       type: searchParams.get("type") ?? undefined,
       status: (searchParams.get("status") as any) ?? undefined,
       region: searchParams.get("region") ?? undefined,
@@ -45,12 +45,12 @@ export async function POST(req: NextRequest) {
     requireCan(session.role, "vehicles", "write");
 
     const body = CreateVehicleSchema.parse(await req.json());
-    if (getVehicleByRegistration(body.registrationNumber)) {
+    if (await getVehicleByRegistration(body.registrationNumber)) {
       throw new ValidationError(
         `Registration number ${body.registrationNumber} is already in use.`
       );
     }
-    const vehicle = createVehicle(body);
+    const vehicle = await createVehicle(body);
     return apiOk({ vehicle }, 201);
   } catch (err) {
     return apiError(err);

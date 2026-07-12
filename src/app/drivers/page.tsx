@@ -12,7 +12,7 @@ export default async function DriversPage() {
   const session = await getServerSession();
   if (!session) redirect("/login");
 
-  const drivers = listDrivers();
+  const drivers = await listDrivers();
   const canWrite = can(session.role, "drivers", "write");
 
   return (

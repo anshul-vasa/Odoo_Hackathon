@@ -14,11 +14,11 @@ export default async function ReportsPage() {
   const session = await getServerSession();
   if (!session) redirect("/login");
 
-  const vehicles = listVehicles();
-  const allTrips = listTrips();
-  const allFuel = listFuelLogs();
-  const allExpenses = listExpenses();
-  const allMaintenance = listMaintenanceRecords();
+  const vehicles = await listVehicles();
+  const allTrips = await listTrips();
+  const allFuel = await listFuelLogs();
+  const allExpenses = await listExpenses();
+  const allMaintenance = await listMaintenanceRecords();
 
   const activeVehicles = vehicles.filter((v) => v.status !== "RETIRED").length;
   const onTripVehicles = vehicles.filter((v) => v.status === "ON_TRIP").length;

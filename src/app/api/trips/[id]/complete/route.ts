@@ -17,7 +17,7 @@ export async function POST(
     const session = await requireSession(req);
     requireCan(session.role, "trips", "write");
     const body = CompleteTripSchema.parse(await req.json());
-    const trip = completeTrip(params.id, body);
+    const trip = await completeTrip(params.id, body);
     return apiOk({ trip });
   } catch (err) {
     return apiError(err);

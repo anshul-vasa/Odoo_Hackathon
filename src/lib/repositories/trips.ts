@@ -16,7 +16,7 @@ export interface TripFilters {
   driverId?: string;
 }
 
-export function listTrips(filters: TripFilters = {}): Trip[] {
+export async function listTrips(filters: TripFilters = {}): Promise<Trip[]> {
   const clauses: string[] = [];
   const params: (string | number | null)[] = [];
   if (filters.status) {
@@ -33,12 +33,12 @@ export function listTrips(filters: TripFilters = {}): Trip[] {
   }
   const where = clauses.length ? `WHERE ${clauses.join(" AND ")}` : "";
   return toRows<Trip>(
-    db.prepare(`SELECT * FROM trips ${where} ORDER BY created_at DESC`).all(...params)
+    await db.prepare(`SELECT * FROM trips ${where} ORDER BY created_at DESC`).all(...params)
   );
 }
 
-export function getTripById(id: string): Trip | undefined {
-  return toRow<Trip>(db.prepare("SELECT * FROM trips WHERE id = ?").get(id));
+export async function getTripById(id: string): Promise<Trip | undefined> {
+  return toRow<Trip>(await db.prepare("SELECT * FROM trips WHERE id = ?").get(id));
 }
 
 /**
@@ -47,10 +47,10 @@ export function getTripById(id: string): Trip | undefined {
  * Shared between createTrip (initial assignment) and dispatchTrip
  * (re-validated defensively in case state changed between Draft and Dispatch).
  */
-function assertAssignable(vehicleId: string, driverId: string, cargoWeight: number) {
-  const vehicle = getVehicleById(vehicleId);
+async function assertAssignable(vehicleId: string, driverId: string, cargoWeight: number) {
+  const vehicle = await getVehicleById(vehicleId);
   if (!vehicle) throw new NotFoundError("Vehicle not found.");
-  const driver = getDriverById(driverId);
+  const driver = await getDriverById(driverId);
   if (!driver) throw new NotFoundError("Driver not found.");
 
   if (vehicle.status === "RETIRED" || vehicle.status === "IN_SHOP") {
@@ -88,18 +88,18 @@ function assertAssignable(vehicleId: string, driverId: string, cargoWeight: numb
   return { vehicle, driver };
 }
 
-export function createTrip(input: {
+export async function createTrip(input: {
   source: string;
   destination: string;
   vehicleId: string;
   driverId: string;
   cargoWeight: number;
   plannedDistance: number;
-}): Trip {
-  assertAssignable(input.vehicleId, input.driverId, input.cargoWeight);
+}): Promise<Trip> {
+  await assertAssignable(input.vehicleId, input.driverId, input.cargoWeight);
 
   const id = newId("trp");
-  db.prepare(
+  await db.prepare(
     `INSERT INTO trips
       (id, source, destination, cargo_weight, planned_distance, vehicle_id, driver_id, status)
      VALUES (?, ?, ?, ?, ?, ?, ?, 'DRAFT')`
@@ -112,34 +112,34 @@ export function createTrip(input: {
     input.vehicleId,
     input.driverId
   );
-  return getTripById(id)!;
+  return (await getTripById(id))!;
 }
 
-export function dispatchTrip(tripId: string): Trip {
-  const trip = getTripById(tripId);
+export async function dispatchTrip(tripId: string): Promise<Trip> {
+  const trip = await getTripById(tripId);
   if (!trip) throw new NotFoundError("Trip not found.");
   if (trip.status !== "DRAFT") {
     throw new ConflictError(`Trip is ${trip.status.toLowerCase()}, not Draft — cannot dispatch.`);
   }
 
   // Re-validate: state may have changed since the trip was drafted.
-  assertAssignable(trip.vehicle_id, trip.driver_id, trip.cargo_weight);
+  await assertAssignable(trip.vehicle_id, trip.driver_id, trip.cargo_weight);
 
-  return withTransaction(() => {
-    db.prepare(
+  return withTransaction(async () => {
+    await db.prepare(
       "UPDATE trips SET status = 'DISPATCHED', dispatched_at = datetime('now') WHERE id = ?"
     ).run(tripId);
-    setVehicleStatus(trip.vehicle_id, "ON_TRIP");
-    setDriverStatus(trip.driver_id, "ON_TRIP");
-    return getTripById(tripId)!;
+    await setVehicleStatus(trip.vehicle_id, "ON_TRIP");
+    await setDriverStatus(trip.driver_id, "ON_TRIP");
+    return (await getTripById(tripId))!;
   });
 }
 
-export function completeTrip(
+export async function completeTrip(
   tripId: string,
   input: { actualDistance: number; fuelConsumed: number }
-): Trip {
-  const trip = getTripById(tripId);
+): Promise<Trip> {
+  const trip = await getTripById(tripId);
   if (!trip) throw new NotFoundError("Trip not found.");
   if (trip.status !== "DISPATCHED") {
     throw new ConflictError(
@@ -150,8 +150,8 @@ export function completeTrip(
     throw new ValidationError("Actual distance and fuel consumed must be non-negative.");
   }
 
-  return withTransaction(() => {
-    db.prepare(
+  return withTransaction(async () => {
+    await db.prepare(
       `UPDATE trips
        SET status = 'COMPLETED', completed_at = datetime('now'),
            actual_distance = ?, fuel_consumed = ?
@@ -159,19 +159,19 @@ export function completeTrip(
     ).run(input.actualDistance, input.fuelConsumed, tripId);
 
     // Odometer advances by the actual distance driven.
-    const vehicle = getVehicleById(trip.vehicle_id)!;
-    db.prepare(
+    const vehicle = (await getVehicleById(trip.vehicle_id))!;
+    await db.prepare(
       "UPDATE vehicles SET odometer = odometer + ?, updated_at = datetime('now') WHERE id = ?"
     ).run(input.actualDistance, vehicle.id);
 
-    setVehicleStatus(trip.vehicle_id, "AVAILABLE");
-    setDriverStatus(trip.driver_id, "AVAILABLE");
-    return getTripById(tripId)!;
+    await setVehicleStatus(trip.vehicle_id, "AVAILABLE");
+    await setDriverStatus(trip.driver_id, "AVAILABLE");
+    return (await getTripById(tripId))!;
   });
 }
 
-export function cancelTrip(tripId: string): Trip {
-  const trip = getTripById(tripId);
+export async function cancelTrip(tripId: string): Promise<Trip> {
+  const trip = await getTripById(tripId);
   if (!trip) throw new NotFoundError("Trip not found.");
   if (trip.status === "COMPLETED" || trip.status === "CANCELLED") {
     throw new ConflictError(`Trip is already ${trip.status.toLowerCase()}.`);
@@ -179,16 +179,16 @@ export function cancelTrip(tripId: string): Trip {
 
   const wasDispatched = trip.status === "DISPATCHED";
 
-  return withTransaction(() => {
-    db.prepare(
+  return withTransaction(async () => {
+    await db.prepare(
       "UPDATE trips SET status = 'CANCELLED', cancelled_at = datetime('now') WHERE id = ?"
     ).run(tripId);
 
     // Only a *dispatched* trip holds the vehicle/driver On Trip; a Draft never did.
     if (wasDispatched) {
-      setVehicleStatus(trip.vehicle_id, "AVAILABLE");
-      setDriverStatus(trip.driver_id, "AVAILABLE");
+      await setVehicleStatus(trip.vehicle_id, "AVAILABLE");
+      await setDriverStatus(trip.driver_id, "AVAILABLE");
     }
-    return getTripById(tripId)!;
+    return (await getTripById(tripId))!;
   });
 }

@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
     requireCan(session.role, "fuel", "read");
     const { searchParams } = new URL(req.url);
     const vehicleId = searchParams.get("vehicleId") ?? undefined;
-    const expenses = listExpenses(vehicleId);
+    const expenses = await listExpenses(vehicleId);
     return apiOk({ expenses });
   } catch (err) {
     return apiError(err);
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
     const session = await requireSession(req);
     requireCan(session.role, "fuel", "write");
     const body = CreateExpenseSchema.parse(await req.json());
-    const expense = createExpense(body);
+    const expense = await createExpense(body);
     return apiOk({ expense }, 201);
   } catch (err) {
     return apiError(err);

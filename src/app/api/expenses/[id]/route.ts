@@ -10,7 +10,7 @@ export async function DELETE(
   try {
     const session = await requireSession(req);
     requireCan(session.role, "fuel", "write");
-    deleteExpense(params.id);
+    await deleteExpense(params.id);
     return apiOk({ ok: true });
   } catch (err) {
     return apiError(err);

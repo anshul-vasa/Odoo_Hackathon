@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
     requireCan(session.role, "drivers", "read");
 
     const { searchParams } = new URL(req.url);
-    const drivers = listDrivers({
+    const drivers = await listDrivers({
       status: (searchParams.get("status") as any) ?? undefined,
     });
     return apiOk({ drivers });
@@ -39,12 +39,12 @@ export async function POST(req: NextRequest) {
     requireCan(session.role, "drivers", "write");
 
     const body = CreateDriverSchema.parse(await req.json());
-    if (getDriverByLicenseNumber(body.licenseNumber)) {
+    if (await getDriverByLicenseNumber(body.licenseNumber)) {
       throw new ValidationError(
         `License number ${body.licenseNumber} is already registered.`
       );
     }
-    const driver = createDriver(body);
+    const driver = await createDriver(body);
     return apiOk({ driver }, 201);
   } catch (err) {
     return apiError(err);

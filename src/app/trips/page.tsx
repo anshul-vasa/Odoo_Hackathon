@@ -5,24 +5,28 @@ import { PageHeader } from "@/components/PageHeader";
 import { TripForm } from "@/components/TripForm";
 import { TripsTable, type TripRowData } from "@/components/tables/TripsTable";
 import { listTrips } from "@/lib/repositories/trips";
-import { listVehicles, getVehicleById } from "@/lib/repositories/vehicles";
-import { listDrivers, getDriverById, isLicenseExpired } from "@/lib/repositories/drivers";
+import { listVehicles } from "@/lib/repositories/vehicles";
+import { listDrivers, isLicenseExpired } from "@/lib/repositories/drivers";
 import { can } from "@/lib/rbac";
 
 export default async function TripsPage() {
   const session = await getServerSession();
   if (!session) redirect("/login");
 
-  const trips = listTrips();
-  const vehicles = listVehicles({ status: "AVAILABLE" });
-  const drivers = listDrivers({ status: "AVAILABLE" }).filter(
-    (d) => !isLicenseExpired(d)
-  );
+  const trips = await listTrips();
+  const vehicles = await listVehicles({ status: "AVAILABLE" });
+  const availableDrivers = await listDrivers({ status: "AVAILABLE" });
+  const drivers = availableDrivers.filter((d) => !isLicenseExpired(d));
   const canWrite = can(session.role, "trips", "write");
 
+  // All vehicles/drivers referenced by any trip (not just currently-available
+  // ones), so completed/cancelled trips still show the right names.
+  const allVehiclesById = new Map((await listVehicles()).map((v) => [v.id, v]));
+  const allDriversById = new Map((await listDrivers()).map((d) => [d.id, d]));
+
   const tripRows: TripRowData[] = trips.map((t) => {
-    const vehicle = getVehicleById(t.vehicle_id);
-    const driver = getDriverById(t.driver_id);
+    const vehicle = allVehiclesById.get(t.vehicle_id);
+    const driver = allDriversById.get(t.driver_id);
     return {
       id: t.id,
       source: t.source,

@@ -19,13 +19,13 @@ export default async function VehicleDetailPage({
   const session = await getServerSession();
   if (!session) redirect("/login");
 
-  const vehicle = getVehicleById(params.id);
+  const vehicle = await getVehicleById(params.id);
   if (!vehicle) notFound();
 
-  const maintenance = listMaintenanceRecords(vehicle.id);
-  const trips = listTrips({ vehicleId: vehicle.id });
-  const fuelLogs = listFuelLogs(vehicle.id);
-  const expenses = listExpenses(vehicle.id);
+  const maintenance = await listMaintenanceRecords(vehicle.id);
+  const trips = await listTrips({ vehicleId: vehicle.id });
+  const fuelLogs = await listFuelLogs(vehicle.id);
+  const expenses = await listExpenses(vehicle.id);
 
   return (
     <AppShell session={session}>

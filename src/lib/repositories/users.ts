@@ -2,29 +2,29 @@ import { db, toRow, toRows } from "@/lib/db";
 import { newId } from "@/lib/id";
 import type { Role, User } from "@/lib/types";
 
-export function getUserByEmail(email: string): User | undefined {
-  return toRow<User>(db.prepare("SELECT * FROM users WHERE email = ?").get(email));
+export async function getUserByEmail(email: string): Promise<User | undefined> {
+  return toRow<User>(await db.prepare("SELECT * FROM users WHERE email = ?").get(email));
 }
 
-export function getUserById(id: string): User | undefined {
-  return toRow<User>(db.prepare("SELECT * FROM users WHERE id = ?").get(id));
+export async function getUserById(id: string): Promise<User | undefined> {
+  return toRow<User>(await db.prepare("SELECT * FROM users WHERE id = ?").get(id));
 }
 
-export function createUser(input: {
+export async function createUser(input: {
   name: string;
   email: string;
   passwordHash: string;
   role: Role;
-}): User {
+}): Promise<User> {
   const id = newId("usr");
-  db.prepare(
+  await db.prepare(
     "INSERT INTO users (id, name, email, password_hash, role) VALUES (?, ?, ?, ?, ?)"
   ).run(id, input.name, input.email, input.passwordHash, input.role);
-  return getUserById(id)!;
+  return (await getUserById(id))!;
 }
 
-export function listUsers(): User[] {
+export async function listUsers(): Promise<User[]> {
   return toRows<User>(
-    db.prepare("SELECT * FROM users ORDER BY created_at DESC").all()
+    await db.prepare("SELECT * FROM users ORDER BY created_at DESC").all()
   );
 }

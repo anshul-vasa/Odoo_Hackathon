@@ -32,7 +32,8 @@ export async function POST(req: NextRequest) {
     let successCount = 0;
     const errors: { row: number; message: string }[] = [];
 
-    rows.forEach((raw, idx) => {
+    for (let idx = 0; idx < rows.length; idx++) {
+      const raw = rows[idx];
       const rowNum = idx + 2; // +1 header row, +1 for 1-indexing
       try {
         const registrationNumber = str(raw.registrationNumber ?? raw["Vehicle Number"] ?? raw["registration_number"]);
@@ -50,11 +51,11 @@ export async function POST(req: NextRequest) {
         if (!type) throw new Error("Missing type.");
         if (maxLoadCapacity === undefined || maxLoadCapacity <= 0) throw new Error("Invalid max load capacity.");
         if (acquisitionCost === undefined || acquisitionCost < 0) throw new Error("Invalid acquisition cost.");
-        if (getVehicleByRegistration(registrationNumber)) {
+        if (await getVehicleByRegistration(registrationNumber)) {
           throw new Error(`Registration number ${registrationNumber} already exists.`);
         }
 
-        createVehicle({
+        await createVehicle({
           registrationNumber,
           name,
           type,
@@ -69,7 +70,7 @@ export async function POST(req: NextRequest) {
       } catch (err) {
         errors.push({ row: rowNum, message: err instanceof Error ? err.message : "Unknown error." });
       }
-    });
+    }
 
     return apiOk({ successCount, errorCount: errors.length, errors });
   } catch (err) {

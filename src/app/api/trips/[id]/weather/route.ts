@@ -13,7 +13,7 @@ export async function GET(
     const session = await requireSession(req);
     requireCan(session.role, "trips", "read");
 
-    const trip = getTripById(params.id);
+    const trip = await getTripById(params.id);
     if (!trip) throw new NotFoundError("Trip not found.");
 
     const [source, destination] = await Promise.all([
