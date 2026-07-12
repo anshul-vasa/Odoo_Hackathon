@@ -1,95 +1,91 @@
-from marshmallow import Schema, fields, validate, validates, ValidationError
+from marshmallow import Schema, fields, validate
 
 
-# -----------------------------
-# Register Schema
-# -----------------------------
 class RegisterSchema(Schema):
-    first_name = fields.Str(
+    """
+    Schema for user registration.
+    """
+
+    username = fields.Str(
         required=True,
-        validate=validate.Length(min=2, max=50)
+        validate=validate.Length(
+            min=3,
+            max=80
+        )
     )
 
-    last_name = fields.Str(
-        required=True,
-        validate=validate.Length(min=2, max=50)
+    email = fields.Email(
+        required=True
     )
-
-    email = fields.Email(required=True)
 
     password = fields.Str(
         required=True,
-        validate=validate.Length(min=8, max=50)
+        validate=validate.Length(
+            min=6
+        ),
+        load_only=True
     )
 
-    confirm_password = fields.Str(required=True)
+    role_id = fields.Int(
+        required=True
+    )
+
+
+
+class LoginSchema(Schema):
+    """
+    Schema for user login.
+    """
+
+    email = fields.Email(
+        required=True
+    )
+
+    password = fields.Str(
+        required=True,
+        load_only=True
+    )
+
+
+
+class UserSchema(Schema):
+    """
+    User response schema.
+    """
+
+    id = fields.Int()
+
+    username = fields.Str()
+
+    email = fields.Email()
 
     role = fields.Str(
-        required=True,
-        validate=validate.OneOf([
-            "Admin",
-            "Fleet Manager",
-            "Dispatcher",
-            "Safety Officer",
-            "Financial Analyst"
-        ])
+        allow_none=True
     )
 
-    @validates("password")
-    def validate_password(self, value, **kwargs):
-        if len(value) < 8:
-            raise ValidationError(
-                "Password must be at least 8 characters long."
-            )
+    is_active = fields.Bool()
 
-    @validates("confirm_password")
-    def validate_confirm_password(self, value, **kwargs):
-        pass
-
-    def validate(self, data, **kwargs):
-        errors = super().validate(data, **kwargs)
-
-        if data.get("password") != data.get("confirm_password"):
-            errors.setdefault(
-                "confirm_password",
-                []
-            ).append("Passwords do not match.")
-
-        return errors
-
-
-# -----------------------------
-# Login Schema
-# -----------------------------
-class LoginSchema(Schema):
-    email = fields.Email(required=True)
-
-    password = fields.Str(
-        required=True,
-        validate=validate.Length(min=8)
+    last_login = fields.DateTime(
+        allow_none=True
     )
 
+    created_at = fields.DateTime()
 
-# -----------------------------
-# Change Password Schema
-# -----------------------------
-class ChangePasswordSchema(Schema):
-    old_password = fields.Str(required=True)
 
-    new_password = fields.Str(
-        required=True,
-        validate=validate.Length(min=8, max=50)
+
+class TokenSchema(Schema):
+    """
+    JWT token response schema.
+    """
+
+    access_token = fields.Str(
+        required=True
     )
 
-    confirm_password = fields.Str(required=True)
+    token_type = fields.Str(
+        default="Bearer"
+    )
 
-    def validate(self, data, **kwargs):
-        errors = super().validate(data, **kwargs)
-
-        if data.get("new_password") != data.get("confirm_password"):
-            errors.setdefault(
-                "confirm_password",
-                []
-            ).append("Passwords do not match.")
-
-        return errors
+    user = fields.Nested(
+        UserSchema
+    )

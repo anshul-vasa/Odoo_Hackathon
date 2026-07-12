@@ -1,11 +1,8 @@
-from flask import Blueprint
+"""
+Authentication module.
 
-# Authentication Blueprint
-auth_bp = Blueprint(
-    "auth",
-    __name__,
-    url_prefix="/api/auth"
-)
-
-# Import routes after blueprint creation
-from app.auth import routes
+Handles:
+- User authentication
+- JWT token generation
+- Role-based access control
+"""
