@@ -1,0 +1,7 @@
+// NOT USED. Leftover from an early prototype — this project pivoted away from
+// Prisma to Node's built-in node:sqlite (zero native-binary/engine downloads,
+// works identically on every machine). This file could not be deleted from
+// this folder due to a filesystem lock; it is safe to delete manually.
+//
+// The real, current schema lives at: db/schema.sql
+// See README.md, section "Data layer", for why.

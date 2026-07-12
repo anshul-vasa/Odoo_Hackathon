@@ -1,0 +1,11 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Node version Netlify's build image uses — matches package.json "engines"
+# and .nvmrc so builds behave the same as local dev.
+[build.environment]
+  NODE_VERSION = "22"
